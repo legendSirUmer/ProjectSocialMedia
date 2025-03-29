@@ -3,11 +3,11 @@ import React from 'react';
 const Login = () => {
   return (
  
-        <>
+        <div className='mainbody'>
   <div className="row res">
     <div className="fb-form res">
       <div className="card">
-        <h1>facebook</h1>
+        <h1>Ubook</h1>
         <p>Connect with friends and the world </p>
         <p> around you on Facebook.</p>
       </div>
@@ -159,10 +159,10 @@ const Login = () => {
           <a href="#">Contact uploading and non-users</a>
         </li>
       </ol>
-      <small>Meta © 2024</small>
+      <small>Umer © 2025</small>
     </div>
   </footer>
-</>
+</div>
 
 
   );

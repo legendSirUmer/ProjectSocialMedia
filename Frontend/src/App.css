@@ -15,6 +15,7 @@
 .res {
     display: flex;
     align-items: center;
+   
 }
 
 .row {
@@ -23,17 +24,19 @@
     min-height: 100vh;
     
     justify-content: center;
-    background: #f0f2f5;
+    
 }
 
 .fb-form {
     justify-content: space-between;
     max-width: 1000px;
     width: 100%;
+    
 }
 
 .fb-form .card {
     margin-bottom: 90px;
+    
 }
 
 .fb-form h1 {
@@ -48,6 +51,7 @@
 }
 
 form {
+  
     display: flex;
     flex-direction: column;
     background: #fff;
