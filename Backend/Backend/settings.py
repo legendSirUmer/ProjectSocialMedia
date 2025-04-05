@@ -10,6 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+#print('Hi this is test of .env ' + str(os.getenv('DB_HOST')))
+#usage of Environment Variable in .env
+# EMAIL_HOST = os.getenv("EMAIL_HOST")
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_kale_d_=3_t=mi0k^o&y5ytajhxhmqb5vu%!+z#$442nr0yge'
+SECRET_KEY = os.getenv("SECRET_KEY") 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
+    'rest_framework',
     'main',
 ]
 
@@ -48,6 +59,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware", #to remove cors error on React
+
 ]
 
 ROOT_URLCONF = 'Backend.urls'
@@ -77,10 +90,10 @@ WSGI_APPLICATION = 'Backend.wsgi.application'
 DATABASES = {
 'default': {
 'ENGINE': 'mssql',
-'NAME': 'Ubook',
+'NAME': os.getenv('DB_NAME'),
 'USER': '',
 'PASSWORD': '',
-'HOST': 'DESKTOP-1CU83GB\SQLEXPRESS01',
+'HOST': os.getenv('DB_HOST'),
 'PORT': '',
 'OPTIONS': {
 'driver': 'ODBC Driver 17 for SQL Server',
@@ -128,3 +141,22 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
+
+
+
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "http://localhost:5173",
+    "http://localhost:8080",
+    "http://127.0.0.1:9000",
+]

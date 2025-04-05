@@ -22,8 +22,7 @@ class Post(models.Model):
     caption = models.TextField()
     created_at = models.DateTimeField(default=datetime.now)
     no_of_likes = models.IntegerField(default=0)
-    encoded_caption = models.TextField(null=True, blank=True)
-    conversion_table = models.TextField(null=True,blank=True)
+
     
     
 
