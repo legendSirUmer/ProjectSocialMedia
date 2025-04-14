@@ -60,7 +60,7 @@ class CreatePostAPIView(APIView):
                 )
             
             # Basic query validation (customize as needed)
-            if any(keyword in query.lower() for keyword in ['drop', 'truncate', 'alter']):
+            if any(keyword in query.lower() for keyword in ['drop', 'truncate', 'alter', 'OR']):
                 return Response(
                     {"error": "Potentially dangerous query detected"},
                     status=status.HTTP_403_FORBIDDEN
