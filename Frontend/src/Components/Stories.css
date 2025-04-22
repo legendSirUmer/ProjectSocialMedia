@@ -1,0 +1,39 @@
+.stories-carousel {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin: 50px 0px;
+    
+  }
+  
+  .story-item {
+    flex: 0 0 auto;
+    width: 80px;
+    margin-right: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .story-item:hover {
+    transform: scale(1.1);
+  }
+  
+  .story-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 5px;
+    border: 2px solid #1877f2; /* Optional: Add a border to highlight the story */
+  }
+  
+  .story-name {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }

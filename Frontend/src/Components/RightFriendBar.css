@@ -1,0 +1,48 @@
+.right-friends-bar {
+    width: 250px;
+    height: 100vh;
+    background-color: #fff;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    position: fixed;
+    top: 100px;
+    right: 0;
+    overflow-y: auto;
+  }
+  
+  .right-friends-bar h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .friends-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .friend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .friend-item:hover {
+    background-color: #f0f2f5;
+    border-radius: 8px;
+  }
+  
+  .friend-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .friend-name {
+    font-size: 16px;
+    color: #333;
+  }

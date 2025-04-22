@@ -16,4 +16,4 @@ logs
 *.njsproj
 *.sln
 *.sw?
-.\AI_Agent\adk-streaming\app\.env
+

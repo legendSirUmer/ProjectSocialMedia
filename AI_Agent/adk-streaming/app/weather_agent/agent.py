@@ -19,7 +19,7 @@ print("Libraries imported.")
 
 
 # Gemini API Key (Get from Google AI Studio: https://aistudio.google.com/app/apikey)
-os.environ["GOOGLE_API_KEY"] = "AIzaSyBaqr_PYU2jFdIvdMUv630XObuRI3QG6ew" 
+os.environ["GOOGLE_API_KEY"] = "KEY" 
 
 
 
