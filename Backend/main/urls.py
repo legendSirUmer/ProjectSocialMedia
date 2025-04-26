@@ -17,7 +17,9 @@ urlpatterns = [
     
     path('allposts/', PostAPIView.as_view(), name='Post-api'),
     path('createpost/',CreatePostAPIView.as_view(), name='CreatePost-api'),
-    
+    path('register/', register_user, name='Register-api'),
+    path('login/', login_user, name='login-api'),
     path('api-auth/', include('rest_framework.urls'))
+    
   
 ]

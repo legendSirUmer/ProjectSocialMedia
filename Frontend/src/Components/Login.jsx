@@ -1,7 +1,46 @@
 import React from 'react';
 import './login.css'
 
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+
+import axios from 'axios';
+
+
 const Login = () => {
+
+
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
+
+  const navigate = useNavigate(); // Initialize the navigate function
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Form submitted:', formData);
+    axios.post('http://127.0.0.1:8000/login/', formData)
+      .then(function (response) {
+        console.log(response);
+        navigate('/main'); // Redirect to the login page after successful submission
+      })
+      .catch(function (error) {
+        console.error('Error during registration:', error);
+      });
+  };
+
+
+
+
+
+
   return (
  
         <div className='mainbody'>
@@ -12,9 +51,14 @@ const Login = () => {
         <p>Connect with friends and the world </p>
         <p> around you on Facebook.</p>
       </div>
-      <form action="#">
-        <input type="email" placeholder="Email or phone number" required="" />
-        <input type="password" placeholder="Password" required="" />
+      <form onSubmit={handleSubmit} >
+        <input name="email"
+            
+            value={formData.firstname}
+            onChange={handleChange}  type="email" placeholder="Email or phone number" required="" />
+        <input name="password"
+            value={formData.firstname}
+            onChange={handleChange} type="password" placeholder="Password" required="" />
         <div className="fb-submit">
           <button type="submit" className="login">
             Login

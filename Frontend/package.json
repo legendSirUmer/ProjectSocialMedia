@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^1.8.4",
+    "axios": "^1.9.0",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
     "react": "^19.0.0",
