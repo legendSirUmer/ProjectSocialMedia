@@ -1,16 +1,9 @@
-
-
-
-
-
-
-
 header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #fff; /* Adjust the background color as needed */
+    background-color: #ffffff; /* Set the background color to white */
     z-index: 1000; /* Ensures it stays above other elements */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
     padding: 10px 20px; /* Optional: Add some padding */
