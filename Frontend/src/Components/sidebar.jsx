@@ -1,56 +1,45 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import "./sidebar.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faUserFriends, faUsers, faStore, faTv, faClock, faBookmark, faCalendarAlt, faCog, faRobot } from "@fortawesome/free-solid-svg-icons";
 
 export default function Sidebar() {
   return (
     <div className="sidebar">
       <div className="sidebar-item">
-        <Link to="/main">
-          <FontAwesomeIcon icon={faHome} size="lg" className="icon-spacing" />
-          <span> Home</span>
-        </Link>
+        <img src="icons/home.svg" alt="Home" />
+        <span>Home</span>
       </div>
       <div className="sidebar-item">
-        <FontAwesomeIcon icon={faUserFriends} size="lg" className="icon-spacing" />
-        <span> Friends</span>
+        <img src="icons/friends.svg" alt="Friends" />
+        <span>Friends</span>
       </div>
       <div className="sidebar-item">
-        <FontAwesomeIcon icon={faUsers} size="lg" className="icon-spacing" />
-        <span> Groups</span>
+        <img src="icons/groups.svg" alt="Groups" />
+        <span>Groups</span>
       </div>
       <div className="sidebar-item">
-        <Link to="/market">
-          <FontAwesomeIcon icon={faStore} size="lg" className="icon-spacing" />
-          <span> Marketplace</span>
-        </Link>
+        <img src="icons/marketplace.svg" alt="Marketplace" />
+        <span>Marketplace</span>
       </div>
       <div className="sidebar-item">
-        <FontAwesomeIcon icon={faTv} size="lg" className="icon-spacing" />
-        <span> Watch</span>
+        <img src="icons/watch.svg" alt="Watch" />
+        <span>Watch</span>
       </div>
       <div className="sidebar-item">
-        <Link to="/ai-agent">
-          <FontAwesomeIcon icon={faRobot} size="lg" className="icon-spacing" />
-          <span>AI Agent</span>
-        </Link>
+        <img src="icons/memories.svg" alt="Memories" />
+        <span>Memories</span>
       </div>
       <hr />
       <div className="sidebar-item">
-        <FontAwesomeIcon icon={faBookmark} size="lg" className="icon-spacing" />
-        <span> Saved</span>
+        <img src="icons/saved.svg" alt="Saved" />
+        <span>Saved</span>
       </div>
       <div className="sidebar-item">
-        <FontAwesomeIcon icon={faCalendarAlt} size="lg" className="icon-spacing" />
-        <span> Events</span>
+        <img src="icons/events.svg" alt="Events" />
+        <span>Events</span>
       </div>
       <div className="sidebar-item">
-        <Link to="/settings">
-          <FontAwesomeIcon icon={faCog} size="lg" className="icon-spacing" />
-          <span> Settings</span>
-        </Link>
+        <img src="icons/settings.svg" alt="Settings" />
+        <span>Settings</span>
       </div>
     </div>
   );

@@ -10,11 +10,6 @@
     left: 0;
     overflow-y: auto;
   }
-
-  .icon-spacing{
-    margin-right: 10px;
-    color: grey;
-  }
   
   .sidebar-item {
     display: flex;

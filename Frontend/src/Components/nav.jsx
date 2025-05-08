@@ -1,112 +1,91 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import './nav.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebookF, faFacebookMessenger } from '@fortawesome/free-brands-svg-icons';
-import { faSearch, faHome, faStore, faTv, faUserAlt, faPlus, faBell, faUserCog } from '@fortawesome/free-solid-svg-icons';
+import './nav.css'
 
 export default function Nav() {
-  const location = useLocation();
 
-  return (
-    <header>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/main" id="fb">
-              <FontAwesomeIcon icon={faFacebookF} />
-            </Link>
-          </li>
-          <li>
-            <button
-              id="search_btn"
-              className={`tooltip ${location.pathname === '/search' ? 'active' : ''}`}
-              data-tooltip="Search"
-            >
-              <FontAwesomeIcon icon={faSearch} />
-            </button>
-          </li>
-          <li id="space2" />
-          <li>
-            <Link
-              className={`tooltip ${location.pathname === '/main' ? 'active' : ''}`}
-              data-tooltip="Home"
-              to="/main"
-              id="home"
-            >
-              <FontAwesomeIcon icon={faHome} />
-            </Link>
-          </li>
-          <li>
-            <Link
-              className={`tooltip ${location.pathname === '/market' ? 'active' : ''}`}
-              data-tooltip="Group"
-              to="/market"
-              id="group"
-            >
-              <FontAwesomeIcon icon={faStore} />
-            </Link>
-          </li>
-          <li>
-            <Link
-              className={`tooltip ${location.pathname === '/watch' ? 'active' : ''}`}
-              data-tooltip="Watch"
-              to="/watch"
-              id="tv"
-            >
-              <FontAwesomeIcon icon={faTv} />
-            </Link>
-          </li>
-          <li>
-            <Link
-              className={`tooltip ${location.pathname === '/profile' ? 'active' : ''}`}
-              data-tooltip="Friend"
-              to="/profile"
-              id="friend"
-            >
-              <FontAwesomeIcon icon={faUserAlt} />
-            </Link>
-          </li>
-          <li id="space1" />
-          <li>
-            <button
-              className={`tooltip ${location.pathname === '/add' ? 'active' : ''}`}
-              data-tooltip="Add"
-              id="btn_plus"
-            >
-              <FontAwesomeIcon icon={faPlus} />
-            </button>
-          </li>
-          <li>
-            <button
-              className={`tooltip ${location.pathname === '/message' ? 'active' : ''}`}
-              data-tooltip="Message"
-              id="btn_msg"
-            >
-              <FontAwesomeIcon icon={faFacebookMessenger} />
-            </button>
-          </li>
-          <li>
-            <button
-              className={`tooltip ${location.pathname === '/notification' ? 'active' : ''}`}
-              data-tooltip="Notification"
-              id="btn_bell"
-            >
-              <FontAwesomeIcon icon={faBell} />
-            </button>
-          </li>
-          <li>
-            <Link
-              className={`tooltip ${location.pathname === '/settings' ? 'active' : ''}`}
-              data-tooltip="Profile"
-              to="/settings"
-              id="btn_profile"
-            >
-              <FontAwesomeIcon icon={faUserCog} />
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </header>
-  );
+
+
+
+    return (
+       
+      
+        <header>
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></link>
+  <nav>
+    <ul>
+      <li>
+        {" "}
+        <a href="#" id="fb">
+          {" "}
+          <i className="fab fa-facebook-f    " />{" "}
+        </a>{" "}
+      </li>
+      <li>
+        {" "}
+        <button id="search_btn" className="tooltip" data-tooltip="Search">
+          {" "}
+          <i className="fas fa-search    " />{" "}
+        </button>{" "}
+      </li>
+      <li id="space2" />
+      <li>
+        {" "}
+        <a className="tooltip active" data-tooltip="Home" href="#" id="home">
+          {" "}
+          <i className="fas fa-home    " />{" "}
+        </a>{" "}
+      </li>
+      <li>
+        {" "}
+        <a className="tooltip" data-tooltip="Group" href="#" id="group">
+          {" "}
+          <i className="fas fa-user-friends    " />{" "}
+        </a>
+      </li>
+      <li>
+        {" "}
+        <a className="tooltip" data-tooltip="Watch" href="#" id="tv">
+          {" "}
+          <i className="fas fa-tv    " />{" "}
+        </a>{" "}
+      </li>
+      <li>
+        {" "}
+        <a className="tooltip" data-tooltip="Friend" href="#" id="friend">
+          {" "}
+          <i className="fas fa-user-alt    " />{" "}
+        </a>{" "}
+      </li>
+      <li id="space1" />
+      <li>
+        {" "}
+        <button className="tooltip" data-tooltip="Add" id="btn_plus">
+          <i className="fas fa-plus    " />
+        </button>{" "}
+      </li>
+      <li>
+        {" "}
+        <button className="tooltip" data-tooltip="Message" id="btn_msg">
+          <i className="fab fa-facebook-messenger    " />
+        </button>
+      </li>
+      <li>
+        {" "}
+        <button className="tooltip" data-tooltip="Notification" id="btn_bell">
+          {" "}
+          <i className="fas fa-bell    " />
+        </button>
+      </li>
+      <li>
+        {" "}
+        <button className="tooltip" data-tooltip="Profile" id="btn_profile">
+          <i className="fas fa-user-cog    " />
+        </button>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+       
+    );
 }

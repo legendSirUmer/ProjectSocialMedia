@@ -1,6 +1,4 @@
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import "./RightFriendBar.css";
 
 export default function RightFriendsBar() {
@@ -23,10 +21,6 @@ export default function RightFriendsBar() {
           </li>
         ))}
       </ul>
-      <div className="friend-item">
-        <FontAwesomeIcon icon={faUserPlus} style={{ color: "#1877f2" }} />
-        <span>Add Friend</span>
-      </div>
     </div>
   );
 }

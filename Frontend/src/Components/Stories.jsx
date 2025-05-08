@@ -1,6 +1,4 @@
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import "./Stories.css";
 
 export default function StoriesCarousel() {
@@ -15,10 +13,6 @@ export default function StoriesCarousel() {
 
   return (
     <div className="stories-carousel">
-      <div className="story-item">
-        <FontAwesomeIcon icon={faPlusCircle} size="2x" style={{ color: "#1877f2" }} />
-        <span>Add Story</span>
-      </div>
       {stories.map((story) => (
         <div key={story.id} className="story-item">
           <img src={story.profilePic} alt={story.name} className="story-pic" />

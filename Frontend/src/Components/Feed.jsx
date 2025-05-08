@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import "./Feed.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp, faComment, faSmile } from "@fortawesome/free-solid-svg-icons";
 
 export default function Feed() {
   const posts = [
@@ -45,14 +43,10 @@ export default function Feed() {
           {post.image && <img src={post.image} alt="Post" className="post-image" />}
           <div className="post-actions">
             <button className="action-button" onClick={() => handleLike(index)}>
-              <FontAwesomeIcon icon={faThumbsUp} /> Like ({likes[index]})
+              👍 Like ({likes[index]})
             </button>
-            <button className="action-button">
-              <FontAwesomeIcon icon={faComment} /> Comment
-            </button>
-            <button className="action-button">
-              <FontAwesomeIcon icon={faSmile} /> Emoji
-            </button>
+            <button className="action-button">💬 Comment</button>
+            <button className="action-button">😊 Emoji</button>
           </div>
         </div>
       ))}
