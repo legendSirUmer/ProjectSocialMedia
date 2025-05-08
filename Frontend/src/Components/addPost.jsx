@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./AddPost.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faImage, faUserTag, faSmile } from "@fortawesome/free-solid-svg-icons";
 
 export default function AddPost() {
   const [postContent, setPostContent] = useState("");
@@ -27,15 +29,15 @@ export default function AddPost() {
         </div>
         <div className="post-options">
           <div className="option">
-            <img src="icons/gallery.svg" alt="Gallery" />
+            <FontAwesomeIcon icon={faImage} style={{ color: "#45bd62" }} />
             <span>Photo/Video</span>
           </div>
           <div className="option">
-            <img src="icons/tag.svg" alt="Tag" />
+            <FontAwesomeIcon icon={faUserTag} style={{ color: "#1877f2" }} />
             <span>Tag Friends</span>
           </div>
           <div className="option">
-            <img src="icons/emoji.svg" alt="Emoji" />
+            <FontAwesomeIcon icon={faSmile} style={{ color: "#f7b928" }} />
             <span>Feeling/Activity</span>
           </div>
         </div>

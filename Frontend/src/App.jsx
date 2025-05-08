@@ -1,4 +1,3 @@
-
 import Login from './Components/Login'
 import MainPage from './Components/mainPage'
 import { useCallback, useEffect, useReducer, useState } from "react";
@@ -9,8 +8,10 @@ import { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import './App.css'
 import Registration from './Components/Registration';
-
-
+import MarketPage from './Components/marketPage';
+import ProfilePage from './Components/profilePage';
+import SettingsPage from './Components/settingsPage';
+import AIAgent from './Components/AIAgent';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -22,21 +23,25 @@ function App() {
     {/* <MainPage></MainPage> */}
     </header>
 
-
-
     <Router>
         <div id="container">
-          <div>
-            <h1>Welcome to Our App</h1>
-            <Link to="/signup">Sign Up</Link>
-            <Link to="/login">Login</Link>
-            <Link to="/main">Main Page</Link>
+          <div hidden>
+       
+            <Link hidden to="/signup">Sign Up</Link>
+            <Link hidden to="/login">Login</Link>
+            <Link hidden  to="/main">Main Page</Link>
+            <Link hidden to="/market">Market</Link>
+            <Link hidden to="/profile">Profile</Link>
+            <Link hidden to="/settings">Settings</Link>
           </div>
           <Routes>
             <Route exact path="/main" element={<MainPage />} />
             <Route exact path="/signup" element={<Registration />} />
             <Route exact path="/login" element={<Login />}/>
-            
+            <Route exact path="/market" element={<MarketPage />} />
+            <Route exact path="/profile" element={<ProfilePage />} />
+            <Route exact path="/settings" element={<SettingsPage />} />
+            <Route path="/ai-agent" element={<AIAgent />} />
           </Routes>
         </div>
       </Router>

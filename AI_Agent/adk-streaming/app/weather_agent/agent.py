@@ -1,7 +1,7 @@
 import os
 import asyncio
 from google.adk.agents import Agent
-
+import pyodbc
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
 from google.genai import types # For creating message Content/Parts
@@ -16,6 +16,43 @@ logging.basicConfig(level=logging.ERROR)
 print("Libraries imported.")
 
 
+def connect_to_sql_server():
+    """Establishes a connection to the SQL Server database."""
+    try:
+        connection = pyodbc.connect(
+            'DRIVER={ODBC Driver 17 for SQL Server};'
+            'SERVER=DESKTOP-1CU83GB\\SQLEXPRESS01;'
+            'DATABASE=WeatherDB;'
+            'Trusted_Connection=yes;'
+          
+        )
+        print("Connected to SQL Server successfully.")
+        return connection
+    except pyodbc.Error as e:
+        print(f"Error connecting to SQL Server: {e}")
+        return None
+
+connection = connect_to_sql_server()
+def fetch_weather_data_from_db(city):
+    """Fetches weather data for a city from the SQL Server database."""
+    if connection:
+        try:
+            cursor = connection.cursor()
+            query = "SELECT temp FROM Weather WHERE city = ?"
+            cursor.execute(query, (city,))
+            result = cursor.fetchone()
+            if result:
+                print(result[0])
+                return {"status": "success", "report": "temprature of this city is " + str(result[0]) + "°C"}
+
+            else:
+                return {"status": "error", "error_message": f"No weather data found for '{city}'."}
+        except pyodbc.Error as e:
+            print(f"Error executing query: {e}")
+            return {"status": "error", "error_message": "Database query failed."}
+        finally:
+            print("Closing cursor...")
+            # connection.close()
 
 
 # Gemini API Key (Get from Google AI Studio: https://aistudio.google.com/app/apikey)
@@ -51,7 +88,10 @@ print("\nEnvironment configured.")
 
 
 
-
+# def get_weather(city: str) -> dict:
+#     """Retrieves the current weather report for a specified city."""
+#     print(f"--- Tool: get_weather called for city: {city} ---")
+#     return fetch_weather_data_from_db(city)
 
 
 # @title Define the get_weather Tool
@@ -73,7 +113,7 @@ def get_weather(city: str) -> dict:
 
     # Mock weather data for simplicity
     mock_weather_db = {
-        "newyork": {"status": "success", "report": "The weather in New York is sunny with a temperature of 25°C."},
+        "newyork": fetch_weather_data_from_db('karachi'),
         "london": {"status": "success", "report": "It's cloudy in London with a temperature of 15°C."},
         "tokyo": {"status": "success", "report": "Tokyo is experiencing light rain and a temperature of 18°C."},
     }
@@ -209,7 +249,7 @@ async def call_agent_async(query: str):
 
 # We need an async function to await our interaction helper
 async def run_conversation():
-    await call_agent_async("What is the weather like in London?")
+    await call_agent_async("What is the temprature like in karachi?")
     await call_agent_async("How about Paris?") # Expecting the tool's error message
     await call_agent_async("Tell me the weather in New York")
 
