@@ -1,4 +1,3 @@
-
 # basic URL Configurations
 from django.urls import include, path
 # import routers
@@ -23,7 +22,5 @@ urlpatterns = [
     path('follow_user/', follow_user, name='FollowUser-api'),
     path('unfollow_user/', unfollow_user, name='UnfollowUser-api'),
     path('create_post/',create_post, name='Create_Post-api'),
-
-    
-  
+    path('add_product/', add_product, name='AddProduct-api'),
 ]

@@ -28,6 +28,13 @@ const Login = () => {
     console.log('Form submitted:', formData);
     axios.post('http://127.0.0.1:8000/login/', formData)
       .then(function (response) {
+        localStorage.setItem('username', JSON.stringify(response.data.username));
+        localStorage.setItem('email', JSON.stringify(response.data.email));
+        localStorage.setItem('id', JSON.stringify(response.data.id));
+        localStorage.setItem('profile_pic', JSON.stringify("http://127.0.0.1:8000/media/"+ response.data.profile_pic));
+        localStorage.setItem('bio', JSON.stringify(response.data.bio));
+        localStorage.setItem('location', JSON.stringify(response.data.location));
+
         console.log(response);
         navigate('/main'); // Redirect to the login page after successful submission
       })

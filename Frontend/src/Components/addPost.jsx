@@ -20,7 +20,11 @@ export default function AddPost() {
     <div className="add-post">
       <form onSubmit={handlePostSubmit}>
         <div className="post-header">
-          <img src="icons/user-profile.jpg" alt="User" className="user-profile" />
+          <img 
+            src={localStorage.getItem('profile_pic') || 'icons/user-profile.jp'} 
+            alt="User" 
+            className="user-profile" 
+          />
           <textarea
             placeholder="What's on your mind?"
             value={postContent}

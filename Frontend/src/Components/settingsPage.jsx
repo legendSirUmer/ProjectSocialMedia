@@ -5,10 +5,13 @@ import Sidebar from './sidebar';
 
 export default function SettingsPage() {
   const [formData, setFormData] = useState({
-    name: 'John Doe',
-    email: 'johndoe@example.com',
+    name: localStorage.getItem('username') || '',
+    email: localStorage.getItem('email') || '',
     password: '',
     notifications: true,
+    bio: localStorage.getItem('bio') || '',
+    profilePic: localStorage.getItem('profile_pic') || '',
+    location: localStorage.getItem('location') || '',
   });
 
   const handleChange = (e) => {
@@ -16,6 +19,13 @@ export default function SettingsPage() {
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? checked : value,
+    });
+  };
+
+  const handleFileChange = (e) => {
+    setFormData({
+      ...formData,
+      profilePic: e.target.files[0],
     });
   };
 
@@ -61,6 +71,35 @@ export default function SettingsPage() {
               id="password"
               name="password"
               value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="bio">Bio</label>
+            <textarea
+              id="bio"
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="profilePic">Profile Picture</label>
+            <input
+              type="file"
+              id="profilePic"
+              name="profilePic"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="location">Location</label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={formData.location}
               onChange={handleChange}
             />
           </div>

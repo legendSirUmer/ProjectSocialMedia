@@ -4,7 +4,7 @@ from rest_framework import viewsets
 # import local data
 
 from django.contrib.auth.hashers import make_password,check_password
-from .models import Post
+from .models import Post, Product,Profile 
 
 from rest_framework import authentication, permissions
 from django.contrib.auth.models import User
@@ -199,9 +199,10 @@ def login_user(request):
 
         if User.objects.filter(email=email).exists():
             CurrUser = User.objects.get(email=email)
+            CurrProfile = Profile.objects.get(user=CurrUser)
             if check_password(password, CurrUser.password):
                 return Response(
-                    {"message": "Login successful."},
+                    {"message": "Login successful.","username": CurrUser.username , "email": CurrUser.email, "id": CurrUser.id,'profileimg': CurrProfile.profileimg.url,'bio': CurrProfile.bio,'location': CurrProfile.location},   
                     status=status.HTTP_200_OK
                 )
             else:
@@ -376,6 +377,66 @@ def create_post(request):
         )
         return Response(
             {"message": "Post created successfully."},
+            status=status.HTTP_201_CREATED
+        )
+
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@csrf_exempt
+def add_product(request):
+    """
+    API to add a new product.
+    Expected payload:
+    {
+        "user_id": 1,
+        "name": "Product Name",
+        "price": 100.00,
+        "category": "Mobiles",
+        "description": "Product description",
+        "image": "image_url_or_path"
+    }
+    """
+    try:
+        user_id = request.data.get('user_id')
+        name = request.data.get('name')
+        price = request.data.get('price')
+        category = request.data.get('category')
+        description = request.data.get('description', '')
+        image = request.data.get('image', None)
+
+        if not user_id or not name or not price or not category:
+            return Response(
+                {"error": "All fields (user_id, name, price, category) are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check if the user exists
+        if not User.objects.filter(id=user_id).exists():
+            return Response(
+                {"error": "User does not exist."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = User.objects.get(id=user_id)
+
+        # Create the product
+        Product.objects.create(
+            User=user,
+            name=name,
+            price=price,
+            category=category,
+            description=description,
+            image=image
+        )
+
+        return Response(
+            {"message": "Product added successfully."},
             status=status.HTTP_201_CREATED
         )
 
