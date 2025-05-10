@@ -13,6 +13,7 @@ import ProfilePage from './Components/profilePage';
 import SettingsPage from './Components/settingsPage';
 import AIAgent from './Components/AIAgent';
 
+
 function App() {
   const [count, setCount] = useState(0)
 
@@ -28,20 +29,25 @@ function App() {
           <div hidden>
        
             <Link hidden to="/signup">Sign Up</Link>
-            <Link hidden to="/login">Login</Link>
+            <Link hidden to="/">Login</Link>
             <Link hidden  to="/main">Main Page</Link>
             <Link hidden to="/market">Market</Link>
             <Link hidden to="/profile">Profile</Link>
             <Link hidden to="/settings">Settings</Link>
+            <Link hidden to="/ai-agent">AI Agent</Link>
+            
           </div>
           <Routes>
             <Route exact path="/main" element={<MainPage />} />
             <Route exact path="/signup" element={<Registration />} />
-            <Route exact path="/login" element={<Login />}/>
+            <Route exact path="/" element={<Login />}/>
             <Route exact path="/market" element={<MarketPage />} />
             <Route exact path="/profile" element={<ProfilePage />} />
             <Route exact path="/settings" element={<SettingsPage />} />
             <Route path="/ai-agent" element={<AIAgent />} />
+         
+            <Route path="*" element={<h1>404 Not Found</h1>} />
+
           </Routes>
         </div>
       </Router>

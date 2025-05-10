@@ -69,7 +69,7 @@ const Login = () => {
         </div>
         <hr />
         <div className="button">
-          <a href="#">Create new account</a>
+          <a onClick={() => navigate('/signup')} href="#">Create new account</a>
         </div>
       </form>
     </div>

@@ -19,7 +19,11 @@ urlpatterns = [
     path('createpost/',CreatePostAPIView.as_view(), name='CreatePost-api'),
     path('register/', register_user, name='Register-api'),
     path('login/', login_user, name='login-api'),
-    path('api-auth/', include('rest_framework.urls'))
+    path('api-auth/', include('rest_framework.urls')),
+    path('follow_user/', follow_user, name='FollowUser-api'),
+    path('unfollow_user/', unfollow_user, name='UnfollowUser-api'),
+    path('create_post/',create_post, name='Create_Post-api'),
+
     
   
 ]

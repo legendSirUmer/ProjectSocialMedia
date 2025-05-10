@@ -8,7 +8,6 @@ User = get_user_model()
 # Create your models here.
 class Profile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    id_user = models.IntegerField()
     bio = models.TextField(blank=True)
     profileimg = models.ImageField(upload_to='profile_images', default='blank-profile-picture.png')
     location = models.CharField(max_length=100, blank=True)
@@ -22,9 +21,6 @@ class Post(models.Model):
     caption = models.TextField()
     created_at = models.DateTimeField(default=datetime.now)
     no_of_likes = models.IntegerField(default=0)
-
-    
-    
 
     def __str__(self):
         return self.user
@@ -42,3 +38,30 @@ class FollowersCount(models.Model):
 
     def __str__(self):
         return self.user
+
+class Product(models.Model):
+    CATEGORY_CHOICES = [
+        ("Mobiles", "Mobiles"),
+        ("Vehicles", "Vehicles"),
+        ("Property For Sale", "Property For Sale"),
+        ("Property For Rent", "Property For Rent"),
+        ("Electronics & Home Appliances", "Electronics & Home Appliances"),
+        ("Bikes", "Bikes"),
+        ("Business, Industrial & Agriculture", "Business, Industrial & Agriculture"),
+        ("Animals", "Animals"),
+        ("Furniture & Home Decor", "Furniture & Home Decor"),
+        ("Fashion & Beauty", "Fashion & Beauty"),
+        ("Books, Sports & Hobbies", "Books, Sports & Hobbies"),
+        ("Kids", "Kids"),
+        ("Services", "Services"),
+        ("Jobs", "Jobs"),
+    ]
+    User = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    description = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='product_images', blank=True, null=True)
+
+    def __str__(self):
+        return self.name

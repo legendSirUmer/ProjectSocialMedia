@@ -26,7 +26,7 @@ export default function Registration() {
     axios.post('http://127.0.0.1:8000/register/', formData)
       .then(function (response) {
         console.log(response);
-        navigate('/login'); // Redirect to the login page after successful submission
+        navigate('/'); // Redirect to the login page after successful submission
       })
       .catch(function (error) {
         console.error('Error during registration:', error);
@@ -79,38 +79,7 @@ export default function Registration() {
           onChange={handleChange}
           required
         />
-        <div className="form-group">
-          <label>
-            <input
-              type="radio"
-              name="gender"
-              value="Male"
-              onChange={handleChange}
-              required
-            />
-            Male
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="gender"
-              value="Female"
-              onChange={handleChange}
-              required
-            />
-            Female
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="gender"
-              value="Other"
-              onChange={handleChange}
-              required
-            />
-            Other
-          </label>
-        </div>
+
         <button type="submit" className="signup-button">Sign Up</button>
       </form>
     </div>

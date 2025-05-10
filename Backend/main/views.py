@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
 
 
 # create a viewset
@@ -41,7 +42,7 @@ class PostAPIView(APIView):
 
 
 class CreatePostAPIView(APIView):
-    permission_classes = []  # Restrict to admin users
+    permission_classes = []  # no Restriction
     
     def post(self, request):
         """
@@ -219,3 +220,173 @@ def login_user(request):
             {"error": str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['POST'])
+@csrf_exempt
+def follow_user(request):
+    """
+    API to handle user following.
+    Expected payload:
+    {
+        "follower": "username1",  # Username of the user who is following
+        "user": "username2"       # Username of the user being followed
+    }
+    """
+    try:
+        follower = request.data.get('follower')
+        user = request.data.get('user')
+
+        if not follower or not user:
+            return Response(
+                {"error": "Both follower and user are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if follower == user:
+            return Response(
+                {"error": "A user cannot follow themselves."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check if the follow relationship already exists
+        raw_query_check = "SELECT * FROM main_followerscount WHERE user = %s AND follower = %s"
+        params_check = [user, follower]
+
+        with connection.cursor() as cursor:
+            cursor.execute(raw_query_check, params_check)
+            if cursor.fetchone():
+                return Response(
+                    {"message": "You are already following this user."},
+                    status=status.HTTP_200_OK
+                )
+
+        # Insert the follow relationship into the table
+        raw_query_insert = "INSERT INTO main_followerscount VALUES (%s, %s)"
+        params_insert = [user, follower]
+
+        with connection.cursor() as cursor:
+            cursor.execute(raw_query_insert, params_insert)
+
+        return Response(
+            {"message": "Followed the user successfully."},
+            status=status.HTTP_201_CREATED
+        )
+
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@csrf_exempt
+def unfollow_user(request):
+    """
+    API to handle unfollowing a user.
+    Expected payload:
+    {
+        "follower": "username1",  # Username of the user who is unfollowing
+        "user": "username2"       # Username of the user being unfollowed
+    }
+    """
+    try:
+        follower = request.data.get('follower')
+        user = request.data.get('user')
+
+        if not follower or not user:
+            return Response(
+                {"error": "Both follower and user are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if follower == user:
+            return Response(
+                {"error": "A user cannot unfollow themselves."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check if the follow relationship exists
+        raw_query_check = "SELECT * FROM main_followerscount WHERE user = %s AND follower = %s"
+        params_check = [user, follower]
+
+        with connection.cursor() as cursor:
+            cursor.execute(raw_query_check, params_check)
+            if not cursor.fetchone():
+                return Response(
+                    {"message": "You are not following this user."},
+                    status=status.HTTP_200_OK
+                )
+
+        # Delete the follow relationship from the table
+        raw_query_delete = "DELETE FROM main_followerscount WHERE user = %s AND follower = %s"
+        params_delete = [user, follower]
+
+        with connection.cursor() as cursor:
+            cursor.execute(raw_query_delete, params_delete)
+
+        return Response(
+            {"message": "Unfollowed the user successfully."},
+            status=status.HTTP_200_OK
+        )
+
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@csrf_exempt
+def create_post(request):
+    """
+    API to create a new post.
+    Expected payload:
+    {
+        "username": "example_user",
+        "caption": "This is a sample caption",
+        "image": "image_url_or_path"
+    }
+    """
+    try:
+        username = request.data.get('username')
+        caption = request.data.get('caption')
+        image = request.data.get('image')
+
+        if not username or not caption or not image:
+            return Response(
+                {"error": "All fields (username, caption, image) are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check if the user exists
+        if not User.objects.filter(username=username).exists():
+            return Response(
+                {"error": "User does not exist."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Insert the post into the database
+        Post.objects.create(
+            user=username,
+            caption=caption,
+            image=image
+        )
+        return Response(
+            {"message": "Post created successfully."},
+            status=status.HTTP_201_CREATED
+        )
+
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+
+
+
+
