@@ -4,10 +4,11 @@ from django.urls import include, path
 from rest_framework import routers
 # import everything from views
 from .views import *
- 
+from . import views
+
 # define the router
 router = routers.DefaultRouter()
- 
+
 # define the router path and viewset to be used
 #router.register(r'Posts', PostViewSet)
 #router.register(r'Posts', RawQueryAPIView)
@@ -23,4 +24,7 @@ urlpatterns = [
     path('unfollow_user/', unfollow_user, name='UnfollowUser-api'),
     path('create_post/',create_post, name='Create_Post-api'),
     path('add_product/', add_product, name='AddProduct-api'),
+    path('update_profile/', update_profile, name='UpdateProfile-api'),
+    path('create-postobject/', create_post_object, name='CreatePostObject-api'),
+    path('suggested-users/', views.suggested_users, name='suggested_users'),
 ]

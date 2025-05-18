@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './settingsPage.css';
 import Nav from './nav';
 import Sidebar from './sidebar';
+import axios from 'axios';
 
 export default function SettingsPage() {
   const [formData, setFormData] = useState({
@@ -29,10 +30,37 @@ export default function SettingsPage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Updated Settings:', formData);
-    alert('Settings updated successfully!');
+    try {
+      const user_id = localStorage.getItem('id');
+      const formPayload = new FormData();
+      formPayload.append('user_id', user_id);
+      formPayload.append('bio', formData.bio);
+      formPayload.append('location', formData.location);
+      // Only append profilePic if it's a File (user selected a new one)
+      if (formData.profilePic && typeof formData.profilePic !== 'string') {
+        formPayload.append('profileimg', formData.profilePic);
+      }
+      const response = await axios.post('http://127.0.0.1:8000/update_profile/', formPayload, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      alert('Settings updated successfully!');
+      // Optionally update localStorage with new values
+      localStorage.setItem('bio', formData.bio);
+      localStorage.setItem('location', formData.location);
+      if (formData.profilePic && typeof formData.profilePic !== 'string') {
+        // If backend returns the new image URL, update localStorage
+        if (response.data.profileimg) {
+          localStorage.setItem('profile_pic', response.data.profileimg);
+        }
+      }
+    } catch (error) {
+      alert('Failed to update settings.');
+      console.error(error);
+    }
   };
 
   return (
@@ -54,16 +82,7 @@ export default function SettingsPage() {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
+      
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input

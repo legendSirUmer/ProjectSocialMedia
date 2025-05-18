@@ -1,12 +1,20 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation ,useNavigate} from 'react-router-dom';
 import './nav.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookF, faFacebookMessenger } from '@fortawesome/free-brands-svg-icons';
-import { faSearch, faHome, faStore, faTv, faUserAlt, faPlus, faBell, faUserCog } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faHome, faStore, faTv, faUserAlt, faPlus, faBell, faUserCog ,faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 
 export default function Nav() {
   const location = useLocation();
+const navigate = useNavigate();
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to log out?')) {
+    localStorage.removeItem('username');
+    localStorage.removeItem('id');
+    localStorage.removeItem('profile_pic');
+    navigate('/');}
+  }
 
   return (
     <header>
@@ -61,7 +69,7 @@ export default function Nav() {
             <Link
               className={`tooltip ${location.pathname === '/profile' ? 'active' : ''}`}
               data-tooltip="Friend"
-              to="/profile"
+              to={`/profile/${localStorage.getItem('id')}`}
               id="friend"
             >
               <FontAwesomeIcon icon={faUserAlt} />
@@ -73,8 +81,10 @@ export default function Nav() {
               className={`tooltip ${location.pathname === '/add' ? 'active' : ''}`}
               data-tooltip="Add"
               id="btn_plus"
+              onClick={handleLogout}
+            
             >
-              <FontAwesomeIcon icon={faPlus} />
+              <FontAwesomeIcon icon={faSignOutAlt} />
             </button>
           </li>
           <li>

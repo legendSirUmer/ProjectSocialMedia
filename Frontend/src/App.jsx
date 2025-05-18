@@ -42,6 +42,7 @@ function App() {
             <Route exact path="/signup" element={<Registration />} />
             <Route exact path="/" element={<Login />}/>
             <Route exact path="/market" element={<MarketPage />} />
+            <Route exact path="/profile/:userId" element={<ProfilePage />} />
             <Route exact path="/profile" element={<ProfilePage />} />
             <Route exact path="/settings" element={<SettingsPage />} />
             <Route path="/ai-agent" element={<AIAgent />} />

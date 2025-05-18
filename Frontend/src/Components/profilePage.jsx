@@ -1,51 +1,135 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import './profilePage.css';
 import Nav from './nav';
 import Sidebar from './sidebar';
 
 export default function ProfilePage() {
-  const user = {
-    name: 'John Doe',
-    profilePicture: 'images/user-profile.jpg',
-    coverPhoto: 'images/cover-photo.jpg',
-    bio: 'Software Engineer | Tech Enthusiast | Avid Reader',
-    location: 'San Francisco, CA',
-    joined: 'January 2020',
-    posts: [
-      { id: 1, content: 'Had a great day at the park!', image: 'images/post1.jpg' },
-      { id: 2, content: 'Loving the new recipe I tried today!', image: 'images/post2.jpg' },
-      { id: 3, content: 'Check out this amazing sunset!', image: 'images/post3.jpg' },
-    ],
+  const { userId } = useParams();
+  const [user, setUser] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [loadingFollow, setLoadingFollow] = useState(false);
+  const loggedInUserId = localStorage.getItem('id');
+
+  useEffect(() => {
+    if (!userId) return;
+    // Fetch profile data for the user
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/createpost/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: 'SELECT u.username, p.profileimg, p.bio, p.location, u.date_joined FROM auth_user u JOIN main_profile p ON u.id = p.user_id WHERE u.id = %s',
+            params: [userId]
+          })
+        });
+        const data = await response.json();
+        console.log("userdata table "+data);
+        if (data && data.length > 0) {
+          setUser({
+            name: data[0].username,
+            profilePicture: data[0].profileimg,
+            coverPhoto: 'images/cover-photo.jpg', // Placeholder, update if you have cover photo
+            bio: data[0].bio,
+            location: data[0].location,
+            joined: new Date(data[0].date_joined).toLocaleString('default', { month: 'long', year: 'numeric' }),
+            posts: [] // You can fetch posts similarly if needed
+          });
+        }
+      } catch (error) {
+        // handle error
+      }
+    };
+
+    // Check if logged-in user follows this user
+    const checkFollowing = async () => {
+      if (!loggedInUserId || loggedInUserId === userId) return;
+      try {
+        const response = await fetch('http://127.0.0.1:8000/createpost/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: 'SELECT * FROM main_followerscount WHERE user_id = %s AND follower_id = %s',
+            params: [loggedInUserId,userId]
+          })
+        });
+        const data = await response.json();
+        console.log("followercount table "+data);
+        setIsFollowing(Array.isArray(data) && data.length > 0);
+      } catch (error) {
+        // handle error
+      }
+    };
+
+    fetchProfile();
+    checkFollowing();
+  }, [userId, loggedInUserId]);
+
+  const handleFollowToggle = async () => {
+    setLoadingFollow(true);
+    try {
+      const url = isFollowing
+        ? 'http://127.0.0.1:8000/unfollow_user/'
+        : 'http://127.0.0.1:8000/follow_user/';
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user: userId,
+          follower: loggedInUserId
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setIsFollowing(!isFollowing);
+      } else {
+        alert(data.error || 'Failed to update follow status.');
+      }
+    } catch (error) {
+      alert('Failed to update follow status.');
+    }
+    setLoadingFollow(false);
   };
 
   return (
     <div>
-      <header className='navheader'>
-        <Nav />
-      </header>
+      <Nav />
       <Sidebar />
-      <div className="profile-page" style={{ marginLeft: "250px", marginTop: "100px" }}>
-        <div className="cover-photo">
-          <img src={user.coverPhoto} alt="Cover" />
-        </div>
-        <div className="profile-info">
-          <img src={user.profilePicture} alt="Profile" className="profile-picture" />
-          <h1>{user.name}</h1>
-          <p className="bio">{user.bio}</p>
-          <p className="location">📍 {user.location}</p>
-          <p className="joined">Joined: {user.joined}</p>
-        </div>
-        <div className="profile-posts">
-          <h2>Posts</h2>
-          <div className="posts-grid">
-            {user.posts.map((post) => (
-              <div key={post.id} className="post-item">
-                <img src={post.image} alt="Post" className="post-image" />
-                <p>{post.content}</p>
-              </div>
-            ))}
+      <div className="profile-page">
+        {user && (
+          <div className="profile-header">
+            <img
+              src={
+                user.profilePicture
+                  ? user.profilePicture.startsWith('http')
+                    ? user.profilePicture
+                    : `http://127.0.0.1:8000${user.profilePicture}`
+                  : 'images/user-profile.jpg'
+              }
+              alt={user.name}
+              className="profile-img"
+            />
+            <h2>{user.name}</h2>
+            <p>{user.bio}</p>
+            <p>{user.location}</p>
+            <p>Joined: {user.joined}</p>
+            {/* Follow/Unfollow button logic */}
+            {loggedInUserId !== userId && (
+              <button
+                className="follow-btn"
+                onClick={handleFollowToggle}
+                disabled={loadingFollow}
+              >
+                {loadingFollow
+                  ? 'Please wait...'
+                  : isFollowing
+                  ? 'Unfollow'
+                  : 'Follow'}
+              </button>
+            )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

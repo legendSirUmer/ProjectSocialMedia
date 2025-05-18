@@ -199,6 +199,7 @@ def login_user(request):
 
         if User.objects.filter(email=email).exists():
             CurrUser = User.objects.get(email=email)
+            
             CurrProfile = Profile.objects.get(user=CurrUser)
             if check_password(password, CurrUser.password):
                 return Response(
@@ -251,7 +252,7 @@ def follow_user(request):
             )
 
         # Check if the follow relationship already exists
-        raw_query_check = "SELECT * FROM main_followerscount WHERE user = %s AND follower = %s"
+        raw_query_check = "SELECT * FROM main_followerscount WHERE user_id = %s AND follower_id = %s"
         params_check = [user, follower]
 
         with connection.cursor() as cursor:
@@ -295,6 +296,7 @@ def unfollow_user(request):
     try:
         follower = request.data.get('follower')
         user = request.data.get('user')
+        print(user,follower)
 
         if not follower or not user:
             return Response(
@@ -309,8 +311,8 @@ def unfollow_user(request):
             )
 
         # Check if the follow relationship exists
-        raw_query_check = "SELECT * FROM main_followerscount WHERE user = %s AND follower = %s"
-        params_check = [user, follower]
+        raw_query_check = "SELECT * FROM main_followerscount WHERE user_id = %s AND follower_id = %s"
+        params_check = [ follower,user]
 
         with connection.cursor() as cursor:
             cursor.execute(raw_query_check, params_check)
@@ -319,10 +321,10 @@ def unfollow_user(request):
                     {"message": "You are not following this user."},
                     status=status.HTTP_200_OK
                 )
-
+        print(user,follower)
         # Delete the follow relationship from the table
-        raw_query_delete = "DELETE FROM main_followerscount WHERE user = %s AND follower = %s"
-        params_delete = [user, follower]
+        raw_query_delete = "DELETE FROM main_followerscount WHERE user_id = %s AND follower_id = %s"
+        params_delete = [ follower,user]
 
         with connection.cursor() as cursor:
             cursor.execute(raw_query_delete, params_delete)
@@ -445,6 +447,136 @@ def add_product(request):
             {"error": str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['POST'])
+@csrf_exempt
+def update_profile(request):
+    """
+    API to update a user's profile.
+    Expected payload:
+    {
+        "user_id": 1,
+        "bio": "New bio text",
+        "location": "New location",
+        "profileimg": "profile_images/new-image.png"  # Optional
+    }
+    """
+    try:
+        user_id = request.data.get('user_id')
+        bio = request.data.get('bio', None)
+        location = request.data.get('location', None)
+        profileimg = request.data.get('profileimg', None)
+
+        if not user_id:
+            return Response(
+                {"error": "user_id is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not Profile.objects.filter(user_id=user_id).exists():
+            return Response(
+                {"error": "Profile does not exist for this user."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        profile = Profile.objects.get(user_id=user_id)
+        if bio is not None:
+            profile.bio = bio
+        if location is not None:
+            profile.location = location
+        if profileimg is not None:
+            profile.profileimg = profileimg
+        profile.save()
+
+        return Response(
+            {"message": "Profile updated successfully.",
+             "profileimg": profile.profileimg.url,
+             
+             },
+            status=status.HTTP_200_OK
+        )
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+@csrf_exempt
+def create_post_object(request):
+    """
+    API to create a new Post object.
+    Accepts multipart/form-data for image upload.
+    Expected payload:
+    {
+        "username": "example_user",
+        "caption": "This is a sample caption",
+        "image": <uploaded file>
+    }
+    """
+    try:
+        username = request.POST.get('username')
+        caption = request.POST.get('caption')
+        image = request.FILES.get('image')
+
+        if not username or not caption or not image:
+            return Response(
+                {"error": "All fields (username, caption, image) are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check if the user exists
+        if not User.objects.filter(username=username).exists():
+            return Response(
+                {"error": "User does not exist."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Create the post
+        Post.objects.create(
+            user=username,
+            caption=caption,
+            image=image
+        )
+        return Response(
+            {"message": "Post created successfully."},
+            status=status.HTTP_201_CREATED
+        )
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+def suggested_users(request):
+    """
+    Returns a list of random user suggestions (excluding the current user if provided).
+    Each user includes id, username, and profileimg (if exists).
+    """
+    import random
+    from .models import Profile
+    try:
+        # Optionally exclude the current user from suggestions
+        current_user_id = request.data.get('user_id')
+        print(current_user_id)
+        users_qs = Profile.objects.all()
+        if current_user_id:
+            users_qs = users_qs.exclude(user_id=current_user_id)
+        users = list(users_qs)
+        print(users)
+        random.shuffle(users)
+        suggestions = []
+        for user in users[:5]:  # Limit to 5 suggestions
+            suggestions.append({
+                'id': user.user.id,
+                'username': user.user.username,
+                'profileimg': user.profileimg.url if user.profileimg else ''
+            })
+        return Response(suggestions, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
