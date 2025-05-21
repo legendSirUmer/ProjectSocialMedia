@@ -27,4 +27,5 @@ urlpatterns = [
     path('update_profile/', update_profile, name='UpdateProfile-api'),
     path('create-postobject/', create_post_object, name='CreatePostObject-api'),
     path('suggested-users/', views.suggested_users, name='suggested_users'),
+    path('create_story/', views.create_story, name='create_story'),
 ]

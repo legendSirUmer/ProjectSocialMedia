@@ -26,6 +26,21 @@ export default function ProfilePage() {
         });
         const data = await response.json();
         console.log("userdata table "+data);
+        let posts = [];
+        // Fetch posts for this user
+        try {
+          const postsResponse = await fetch('http://127.0.0.1:8000/createpost/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: 'SELECT id, image, caption, created_at FROM main_post WHERE [user] = %s ORDER BY created_at DESC',
+              params: [data[0].username]
+            })
+          });
+          posts = await postsResponse.json();
+        } catch (err) {
+          posts = [];
+        }
         if (data && data.length > 0) {
           setUser({
             name: data[0].username,
@@ -34,7 +49,7 @@ export default function ProfilePage() {
             bio: data[0].bio,
             location: data[0].location,
             joined: new Date(data[0].date_joined).toLocaleString('default', { month: 'long', year: 'numeric' }),
-            posts: [] // You can fetch posts similarly if needed
+            posts: posts // Attach posts here
           });
         }
       } catch (error) {
@@ -104,15 +119,15 @@ export default function ProfilePage() {
                 user.profilePicture
                   ? user.profilePicture.startsWith('http')
                     ? user.profilePicture
-                    : `http://127.0.0.1:8000${user.profilePicture}`
+                    : `http://127.0.0.1:8000/media/${user.profilePicture}`
                   : 'images/user-profile.jpg'
               }
               alt={user.name}
               className="profile-img"
             />
             <h2>{user.name}</h2>
-            <p>{user.bio}</p>
-            <p>{user.location}</p>
+            <p className="profile-bio">{user.bio}</p>
+            <p className="profile-location">{user.location}</p>
             <p>Joined: {user.joined}</p>
             {/* Follow/Unfollow button logic */}
             {loggedInUserId !== userId && (
@@ -128,6 +143,25 @@ export default function ProfilePage() {
                   : 'Follow'}
               </button>
             )}
+          </div>
+        )}
+        {/* User's posts section */}
+        {user && user.posts && user.posts.length > 0 && (
+          <div className="profile-posts">
+            <h3>{user.name.split(' ')[0]}'s Posts</h3>
+            <div className="profile-posts-list">
+              {user.posts.map(post => (
+                <div key={post.id} className="profile-post-item">
+                  <img
+                    src={post.image ? (post.image.startsWith('http') ? post.image : `http://127.0.0.1:8000/media/${post.image}`) : ''}
+                    alt={post.caption}
+                    className="profile-post-img"
+                  />
+                  <div className="profile-post-caption">{post.caption}</div>
+                  <div className="profile-post-date">{new Date(post.created_at).toLocaleString()}</div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

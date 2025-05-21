@@ -18,7 +18,7 @@ export default function MainPage() {
             </header>
             <Sidebar />
 
-        <div className="main-content" style={{ marginLeft: "550px", marginRight: "550px", marginTop: "350px", padding: "50px" }}>
+        <div className="main-content" style={{ marginLeft: "550px", marginRight: "550px", marginTop: "50px", padding: "50px" }}>
            <center> <AddPost /> </center>
             <StoriesCarousel />
              <Feed />

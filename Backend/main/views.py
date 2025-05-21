@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
+from .spam_detecting_agent.agent import is_spam
 
 
 # create a viewset
@@ -358,6 +359,12 @@ def create_post(request):
         caption = request.data.get('caption')
         image = request.data.get('image')
 
+        if is_spam(caption):
+            return Response(
+            {"error": "Caption detected as spam. Post not created."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
         if not username or not caption or not image:
             return Response(
                 {"error": "All fields (username, caption, image) are required."},
@@ -411,6 +418,8 @@ def add_product(request):
         category = request.data.get('category')
         description = request.data.get('description', '')
         image = request.data.get('image', None)
+
+        
 
         if not user_id or not name or not price or not category:
             return Response(
@@ -533,6 +542,13 @@ def create_post_object(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # SPAM CHECK
+        if is_spam(caption):
+            return Response(
+                {"error": "Caption detected as spam. Post not allowed."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         # Create the post
         Post.objects.create(
             user=username,
@@ -577,6 +593,37 @@ def suggested_users(request):
         return Response(suggestions, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@csrf_exempt
+def create_story(request):
+    """
+    API to create a new Story object.
+    Accepts multipart/form-data for image upload and text.
+    Expected payload:
+    {
+        "user_id": 1,
+        "image": <uploaded file>,
+        "text": "Story text"
+    }
+    """
+    try:
+        user_id = request.POST.get('user_id')
+        text = request.POST.get('text', '')
+        image = request.FILES.get('image', None)
+
+        if not user_id:
+            return Response({"error": "user_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not image and not text.strip():
+            return Response({"error": "Please add an image or text for your story."}, status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=user_id).exists():
+            return Response({"error": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        user = User.objects.get(id=user_id)
+        from .models import Story
+        story = Story.objects.create(user=user, image=image, text=text)
+        return Response({"message": "Story created successfully.", "story_id": story.id}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

@@ -14,6 +14,7 @@ import SettingsPage from './Components/settingsPage';
 import AIAgent from './Components/AIAgent';
 
 
+
 function App() {
   const [count, setCount] = useState(0)
 
@@ -35,6 +36,7 @@ function App() {
             <Link hidden to="/profile">Profile</Link>
             <Link hidden to="/settings">Settings</Link>
             <Link hidden to="/ai-agent">AI Agent</Link>
+
             
           </div>
           <Routes>
@@ -46,6 +48,7 @@ function App() {
             <Route exact path="/profile" element={<ProfilePage />} />
             <Route exact path="/settings" element={<SettingsPage />} />
             <Route path="/ai-agent" element={<AIAgent />} />
+ 
          
             <Route path="*" element={<h1>404 Not Found</h1>} />
 

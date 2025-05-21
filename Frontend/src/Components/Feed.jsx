@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Feed.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp, faComment, faSmile } from "@fortawesome/free-solid-svg-icons";
 
 export default function Feed() {
-  const posts = [
+  const [posts, setPosts] = useState([]);
+  const loggedInUserId = localStorage.getItem("id");
+  const postss = [
     {
       id: 1,
       user: "John Doe",
@@ -33,16 +35,78 @@ export default function Feed() {
     setLikes(newLikes);
   };
 
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        // Fetch posts from users that the current user is following (friends)
+        const response = await fetch("http://127.0.0.1:8000/createpost/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: `
+              SELECT post.id, post.[user], post.caption, post.image, post.created_at, p.profileimg, u.username
+              FROM main_post post
+              JOIN auth_user u ON u.username = post.[user]
+              JOIN main_profile p ON p.user_id = u.id
+              WHERE u.id IN (
+                SELECT follower_id FROM main_followerscount WHERE user_id = %s
+              )
+              ORDER BY post.created_at DESC
+            `,
+            params: [loggedInUserId],
+          }),
+        });
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setPosts(data);
+          setLikes(data.map(post => post.no_of_likes || 0));
+        }
+      } catch (error) {
+        // Optionally handle error
+      }
+    };
+    if (loggedInUserId) fetchPosts();
+  }, [loggedInUserId]);
+
+
+
+
+
+
   return (
     <div className="feed">
       {posts.map((post, index) => (
         <div key={post.id} className="post">
           <div className="post-header">
-            <img src="icons/user-profile.jpg" alt={post.user} className="user-profile" />
-            <span className="user-name">{post.user}</span>
+            <img
+              src={
+                post.profileimg
+                  ? post.profileimg.startsWith("http")
+                    ? post.profileimg
+                    : `http://127.0.0.1:8000/media/${post.profileimg}`
+                  : "icons/user-profile.jpg"
+              }
+              alt={post.username}
+              className="user-profile"
+            />
+            <span className="user-name">{post.username}</span>
+            <span className="post-date" style={{ marginLeft: "auto", fontSize: "12px", color: "#888" }}>
+              {post.created_at ? new Date(post.created_at).toLocaleString() : ""}
+            </span>
           </div>
-          <p className="post-content">{post.content}</p>
-          {post.image && <img src={post.image} alt="Post" className="post-image" />}
+          <p className="post-content">{post.caption}</p>
+          {post.image && (
+            <img
+              src={
+                post.image.startsWith("http")
+                  ? post.image
+                  : `http://127.0.0.1:8000/media/${post.image}`
+              }
+              alt="Post"
+              className="post-image"
+            />
+          )}
           <div className="post-actions">
             <button className="action-button" onClick={() => handleLike(index)}>
               <FontAwesomeIcon icon={faThumbsUp} /> Like ({likes[index]})

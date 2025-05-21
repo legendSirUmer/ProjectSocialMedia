@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'main',
+  
 ]
 
 MIDDLEWARE = [
@@ -175,3 +176,5 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     "http://localhost:8080",
 #     "http://127.0.0.1:9000",
 # ]
+
+
