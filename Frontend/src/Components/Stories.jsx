@@ -84,7 +84,7 @@ export default function StoriesCarousel() {
         <span>Add Story</span>
       </div>
       {showPopup && (
-        <div className="modal-overlay">
+        <div className="modal-overlay" data-ds-trigger>
           <div className="modal-content">
             <h3>Create Story</h3>
             <form onSubmit={handleSubmitStory}>

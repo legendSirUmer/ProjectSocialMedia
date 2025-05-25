@@ -107,7 +107,7 @@ export default function RightFriendsBar() {
                   user.profileimg
                     ? user.profileimg.startsWith("http")
                       ? user.profileimg
-                      : `http://127.0.0.1:8000/media/${user.profileimg}`
+                      : `http://127.0.0.1:8000/${user.profileimg}`
                     : "icons/user1.jpg"
                 }
                 alt={user.username}

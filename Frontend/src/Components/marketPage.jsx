@@ -88,14 +88,16 @@ export default function MarketPage() {
     }
   };
 
+  const handleShowAddAd = () => setShowAddAd(true);
+  const handleCloseAddAd = () => setShowAddAd(false);
+
   return (
     <>
       <Sidebar></Sidebar>
-        <header>
-          <Nav></Nav>
-        </header>
+      <header>
+        <Nav></Nav>
+      </header> 
       <div style={{ marginLeft: "200px" }} className="marketplace">
-
         <section className="categories">
           <h2>Categories</h2>
           <div className="category-list">
@@ -106,61 +108,67 @@ export default function MarketPage() {
                 onClick={() => handleCategoryClick(category)}
                 style={{ cursor: 'pointer' }}
               >
-                <FontAwesomeIcon icon={categoryIcons[category]} size="2x" className="category-icon" style={{ color: 'grey' }} /> {category}
+                <span className={`category-icon-circle category-${category.replace(/\s|&/g, '').toLowerCase()}`}> 
+                  <FontAwesomeIcon icon={categoryIcons[category]} size="2x" className="category-icon" />
+                </span>
+                {category}
               </div>
             ))}
           </div>
         </section>
 
-
-
-        <button className="sell-button" onClick={() => setShowAddAd(!showAddAd)}>
-          {showAddAd ? 'Cancel' : 'Sell'}
+        <button className="sell-button" data-ds-target onClick={handleShowAddAd}>
+          Sell
         </button>
 
         {showAddAd && (
-          <section className="add-ad">
-            <h2>Add New Ad</h2>
-            <form onSubmit={handleAddAd} className="add-ad-form">
-              <input
-                type="text"
-                name="name"
-                placeholder="Item Name"
-                value={newAd.name}
-                onChange={handleInputChange}
-              />
-              <input
-                type="text"
-                name="price"
-                placeholder="Price"
-                value={newAd.price}
-                onChange={handleInputChange}
-              />
-              <input
-                type="file"
-                name="image"
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-              <select
-                name="category"
-                value={newAd.category}
-                onChange={handleInputChange}
-              >
-                <option value="" disabled>Select Category</option>
-                {categories.map((category, index) => (
-                  <option key={index} value={category}>{category}</option>
-                ))}
-              </select>
-              <textarea
-                name="description"
-                placeholder="Description"
-                value={newAd.description || ''}
-                onChange={handleInputChange}
-              ></textarea>
-              <button type="submit">Add Ad</button>
-            </form>
-          </section>
+          <div className="modal-overlay" data-ds-trigger>
+            <div className="modal-content">
+              <h2>Add New Ad</h2>
+              <form onSubmit={handleAddAd} className="add-ad-form">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Item Name"
+                  value={newAd.name}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="text"
+                  name="price"
+                  placeholder="Price"
+                  value={newAd.price}
+                  onChange={handleInputChange}
+                />
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+                <select
+                  name="category"
+                  value={newAd.category}
+                  onChange={handleInputChange}
+                >
+                  <option value="" disabled>Select Category</option>
+                  {categories.map((category, index) => (
+                    <option key={index} value={category}>{category}</option>
+                  ))}
+                </select>
+                <textarea
+                  name="description"
+                  placeholder="Description"
+                  value={newAd.description || ''}
+                  onChange={handleInputChange}
+                ></textarea>
+                <div style={{marginTop: '10px'}}>
+                  <button type="submit">Add Ad</button>
+                  <button type="button" style={{marginLeft: '10px'}} onClick={handleCloseAddAd}>Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
 
 

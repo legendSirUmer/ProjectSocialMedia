@@ -6,6 +6,8 @@ import RightFriendsBar from './RightFriendBar';
 import StoriesCarousel from './Stories';
 import Feed from './Feed';
 import Registration from './Registration';
+import './mainPage.css';
+
 export default function MainPage() {
 
 
@@ -17,12 +19,14 @@ export default function MainPage() {
             <Nav></Nav>
             </header>
             <Sidebar />
-
-        <div className="main-content" style={{ marginLeft: "550px", marginRight: "550px", marginTop: "50px", padding: "50px" }}>
-           <center> <AddPost /> </center>
-            <StoriesCarousel />
-             <Feed />
        <RightFriendsBar />
+
+        <div className="main-content">
+          <div className="add-post-center">
+            <center><AddPost /></center>
+          </div>
+          <StoriesCarousel />
+          <Feed />
         </div>
 
 

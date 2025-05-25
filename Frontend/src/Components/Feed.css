@@ -1,12 +1,52 @@
-.feed {
+.feed-wrapper {
+    width: 50vw;
+    min-width: 720px;
+    max-width: 780px;
+    margin: 0 auto;
+    margin-top: 30px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  @media (max-width: 1200px) {
+    .feed-wrapper {
+      width: 70vw;
+      max-width: 95vw;
+    }
+  }
+  
+  @media (max-width: 800px) {
+    .main-content {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      padding: 10px !important;
+    }
+    .feed-wrapper {
+      width: 98vw;
+      min-width: 0;
+      max-width: 100vw;
+      padding: 0;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .feed-wrapper {
+      width: 100vw;
+      padding: 0;
+    }
+  }
+  
+  .feed {
     display: flex;
     flex-direction: column;
     gap: 20px;
     margin-top: 20px;
   }
   
-
-
+  
+  
   .post {
     background-color: #fff;
     border-radius: 8px;
@@ -41,10 +81,11 @@
   
   .post-image {
     width: 100%;
-    height: 100%;
+    height: 100%; /* Increased height for taller images */
     border-radius: 8px;
     object-fit: cover;
     margin-bottom: 10px;
+    background: #eee;
   }
   
   .post-actions {

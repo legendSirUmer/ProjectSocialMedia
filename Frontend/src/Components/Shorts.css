@@ -1,0 +1,226 @@
+/* Shorts.css - Facebook-like Shorts/Watch page */
+.shorts-page {
+  background: #f0f2f5;
+  min-height: 100vh;
+  padding: 32px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.shorts-header {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.shorts-header h2 {
+  font-size: 2rem;
+  color: #222;
+  font-weight: 700;
+}
+.upload-btn {
+  background: #1877f2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.upload-btn:hover {
+  background: #145db2;
+}
+.shorts-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 520px;
+  overflow-y: auto;
+  padding-bottom: 32px;
+}
+.shorts-list-vertical {
+  width: 120vw;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  background: #000;
+}
+.shorts-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  padding: 0 0 12px 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.shorts-card-full {
+  width: 60vw;
+  min-width: 340px;
+  max-width: 520px;
+  min-height: 90vh;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: start;
+  background: #000;
+  position: relative;
+  margin: 0 auto;
+}
+.shorts-video {
+  width: 100%;
+  max-height: 420px;
+  border-radius: 16px 16px 0 0;
+  background: #000;
+  object-fit: cover;
+}
+.shorts-video-full {
+  width: 60vw;
+  min-width: 340px;
+  max-width: 700px;
+  height: 90vh;
+  object-fit: cover;
+  background: #000;
+  border-radius: 18px;
+}
+.shorts-info {
+  width: 100%;
+  padding: 10px 18px 0 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.shorts-info-full {
+  position: absolute;
+  bottom: 40px;
+  left: 32px;
+  color: #fff;
+  background: rgba(0,0,0,0.4);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  z-index: 2;
+}
+.shorts-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color:#fff;
+}
+.shorts-user {
+  font-size: 0.95rem;
+  color: #888;
+}
+.shorts-actions {
+  position: absolute;
+  right: 32px;
+  bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  z-index: 10;
+}
+.shorts-action-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(30,30,30,0.35);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  outline: none;
+  padding: 0;
+}
+.shorts-action-btn:hover {
+  background: rgba(24,119,242,0.55);
+  transform: scale(1.08);
+}
+.shorts-action-btn svg {
+  display: block;
+  width: 28px;
+  height: 28px;
+  stroke: #fff;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  padding: 32px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  min-width: 320px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.modal-content h3 {
+  margin-bottom: 18px;
+  font-size: 1.3rem;
+  color: #222;
+}
+.modal-content input[type="file"] {
+  margin-bottom: 12px;
+}
+.modal-content input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+@media (max-width: 600px) {
+  .shorts-header, .shorts-list {
+    max-width: 100vw;
+    padding: 0 4px;
+  }
+  .shorts-card {
+    max-width: 100vw;
+  }
+  .shorts-info-full {
+    left: 8px;
+    right: 8px;
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+  .shorts-actions {
+    right: 10px;
+    bottom: 30px;
+    gap: 16px;
+  }
+  .shorts-action-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .shorts-action-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+@media (max-width: 900px) {
+  .shorts-card-full, .shorts-video-full {
+    width: 95vw;
+    min-width: 0;
+    max-width: 100vw;
+  }
+}

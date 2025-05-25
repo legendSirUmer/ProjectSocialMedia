@@ -93,3 +93,13 @@ def schedule_story_deletion(sender, instance, created, **kwargs):
         def delete_instance():
             instance.delete()
         Timer(24 * 60 * 60, delete_instance).start()
+
+class Shorts(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    video = models.FileField(upload_to='shorts_videos')
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.title}"

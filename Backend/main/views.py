@@ -4,7 +4,7 @@ from rest_framework import viewsets
 # import local data
 
 from django.contrib.auth.hashers import make_password,check_password
-from .models import Post, Product,Profile 
+from .models import Post, Product,Profile ,Shorts
 
 from rest_framework import authentication, permissions
 from django.contrib.auth.models import User
@@ -254,7 +254,7 @@ def follow_user(request):
 
         # Check if the follow relationship already exists
         raw_query_check = "SELECT * FROM main_followerscount WHERE user_id = %s AND follower_id = %s"
-        params_check = [user, follower]
+        params_check = [follower,user]
 
         with connection.cursor() as cursor:
             cursor.execute(raw_query_check, params_check)
@@ -622,6 +622,66 @@ def create_story(request):
         from .models import Story
         story = Story.objects.create(user=user, image=image, text=text)
         return Response({"message": "Story created successfully.", "story_id": story.id}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@csrf_exempt
+def upload_short(request):
+    """
+    API to upload a new short video.
+    Accepts multipart/form-data for video upload.
+    Expected payload:
+    {
+        "user_id": <user_id>,
+        "title": "Short Title",
+        "description": "Description (optional)",
+        "video": <uploaded file>
+    }
+    """
+    try:
+        user_id = request.POST.get('user_id')
+        title = request.POST.get('title')
+        description = request.POST.get('description', '')
+        video = request.FILES.get('video')
+
+        if not user_id or not title or not video:
+            return Response({"error": "user_id, title, and video are required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not User.objects.filter(id=user_id).exists():
+            return Response({"error": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        user = User.objects.get(id=user_id)
+        short = Shorts.objects.create(user=user, title=title, description=description, video=video)
+        return Response({"message": "Short uploaded successfully.", "short_id": short.id}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def get_all_shorts(request):
+    """
+    API to get all shorts (most recent first) using a raw SQL query.
+    Returns a list of shorts with user, title, description, video URL, and created_at.
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('''
+                SELECT s.id, u.username, s.title, s.description, s.video, s.created_at
+                FROM main_shorts s
+                JOIN auth_user u ON s.user_id = u.id
+                ORDER BY s.created_at DESC
+            ''')
+            rows = cursor.fetchall()
+            data = [
+                {
+                    'id': row[0],
+                    'user': row[1],
+                    'title': row[2],
+                    'description': row[3],
+                    'video': request.build_absolute_uri('/media/' + row[4]) if row[4] else '',
+                    'created_at': row[5],
+                }
+                for row in rows
+            ]
+        return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

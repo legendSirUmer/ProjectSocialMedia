@@ -6,6 +6,7 @@ from rest_framework import routers
 from .views import *
 from . import views
 
+
 # define the router
 router = routers.DefaultRouter()
 
@@ -28,4 +29,6 @@ urlpatterns = [
     path('create-postobject/', create_post_object, name='CreatePostObject-api'),
     path('suggested-users/', views.suggested_users, name='suggested_users'),
     path('create_story/', views.create_story, name='create_story'),
+    path('upload_short/', upload_short, name='upload_short'),
+    path('get_all_shorts/', get_all_shorts, name='get_all_shorts'),
 ]

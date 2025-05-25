@@ -1,39 +1,74 @@
 .stories-carousel {
     display: flex;
     overflow-x: auto;
-    padding: 10px;
+    padding: 8px 4px;
     background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
     border-radius: 8px;
-    margin: 50px 0px;
-    
+    margin: 20px 0 10px 0;
+    min-height: 90px;
+    max-width: 780px;
+    width: 100%;
   }
   
   .story-item {
     flex: 0 0 auto;
-    width: 80px;
-    margin-right: 10px;
+    width: 60px;
+    margin-right: 8px;
     text-align: center;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: transform 0.18s ease;
   }
   
   .story-item:hover {
-    transform: scale(1.1);
+    transform: scale(1.07);
   }
   
   .story-pic {
-    width: 60px;
-    height: 60px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    margin-bottom: 5px;
-    border: 2px solid #1877f2; /* Optional: Add a border to highlight the story */
+    margin-bottom: 3px;
+    border: 2px solid #1877f2;
   }
   
   .story-name {
-    font-size: 12px;
+    font-size: 11px;
     color: #333;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 54px;
+  }
+  
+  .story-image {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 8px;
+    margin-top: 3px;
+    object-fit: cover;
+  }
+  
+  @media (max-width: 600px) {
+    .stories-carousel {
+      max-width: 98vw;
+      min-height: 70px;
+      padding: 4px 2px;
+    }
+    .story-item {
+      width: 44px;
+      margin-right: 4px;
+    }
+    .story-pic {
+      width: 32px;
+      height: 32px;
+    }
+    .story-name {
+      font-size: 9px;
+      max-width: 38px;
+    }
+    .story-image {
+      width: 32px !important;
+      height: 32px !important;
+    }
   }
