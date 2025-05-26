@@ -145,7 +145,10 @@
 .follow-btn:hover {
   background: #145db2;
 }
-
+/* profile-post-delete-btn styles */
+.profile-post-delete-btn:hover {
+  background: #ff3333;
+}
 .profile-header {
   background: #fff;
   border-radius: 10px;

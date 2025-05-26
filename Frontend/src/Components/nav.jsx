@@ -88,13 +88,14 @@ const navigate = useNavigate();
             </button>
           </li>
           <li>
-            <button
-              className={`tooltip ${location.pathname === '/message' ? 'active' : ''}`}
+            <Link
+              className={`tooltip ${location.pathname === '/chatroom' ? 'active' : ''}`}
               data-tooltip="Message"
               id="btn_msg"
+              to="/chatroom"
             >
               <FontAwesomeIcon icon={faFacebookMessenger} />
-            </button>
+            </Link>
           </li>
           <li>
             <button

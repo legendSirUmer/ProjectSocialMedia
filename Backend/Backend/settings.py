@@ -48,8 +48,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'channels',
     'main',
-  
+    'chat',
+    
 ]
 
 MIDDLEWARE = [
@@ -83,6 +85,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Backend.wsgi.application'
+ASGI_APPLICATION = 'Backend.asgi.application'
+
+
+# Channels in-memory layer for development
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 
 # Database

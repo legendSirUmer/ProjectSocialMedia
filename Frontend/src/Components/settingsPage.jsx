@@ -5,16 +5,24 @@ import Sidebar from './sidebar';
 import axios from 'axios';
 
 export default function SettingsPage() {
+  const cleanLocalStorage = (key) => {
+    const val = localStorage.getItem(key);
+    // Remove surrounding double quotes if present
+    if (val && val.startsWith('"') && val.endsWith('"')) {
+      return val.slice(1, -1);
+    }
+    return val || '';
+  };
+
   const [formData, setFormData] = useState({
-    name: localStorage.getItem('username') || '',
-    email: localStorage.getItem('email') || '',
+    name: cleanLocalStorage('username'),
+    email: cleanLocalStorage('email'),
     password: '',
     notifications: true,
-    bio: localStorage.getItem('bio') || '',
-    profilePic: localStorage.getItem('profile_pic') || '',
-    location: localStorage.getItem('location') || '',
+    bio: cleanLocalStorage('bio'),
+    profilePic: cleanLocalStorage('profile_pic'),
+    location: cleanLocalStorage('location'),
   });
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({

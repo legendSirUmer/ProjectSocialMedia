@@ -2,7 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./sidebar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faUserFriends, faUsers, faStore, faTv, faClock, faBookmark, faCalendarAlt, faCog, faRobot } from "@fortawesome/free-solid-svg-icons";
+import { faFacebookF, faFacebookMessenger } from '@fortawesome/free-brands-svg-icons';
+import { faHome, faUserFriends, faUsers, faStore, faTv, faClock, faBookmark, faCalendarAlt, faCog, faRobot} from "@fortawesome/free-solid-svg-icons";
 
 export default function Sidebar() {
   return (
@@ -14,8 +15,10 @@ export default function Sidebar() {
         </Link>
       </div>
       <div className="sidebar-item">
-        <FontAwesomeIcon icon={faUserFriends} size="lg" className="icon-spacing" />
-        <span> Friends</span>
+        <Link to="/chatroom">
+          <FontAwesomeIcon icon={faFacebookMessenger} size="lg" className="icon-spacing" />
+          <span> Chatroom</span>
+        </Link>
       </div>
       <div className="sidebar-item">
         <FontAwesomeIcon icon={faUsers} size="lg" className="icon-spacing" />
@@ -28,8 +31,10 @@ export default function Sidebar() {
         </Link>
       </div>
       <div className="sidebar-item">
-        <FontAwesomeIcon icon={faTv} size="lg" className="icon-spacing" />
-        <span> Watch</span>
+        <Link to="/watch">
+          <FontAwesomeIcon icon={faTv} size="lg" className="icon-spacing" />
+          <span> Shorts</span>
+        </Link>
       </div>
       <div className="sidebar-item">
         <Link to="/ai-agent">

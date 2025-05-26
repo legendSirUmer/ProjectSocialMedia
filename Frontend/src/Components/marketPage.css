@@ -183,3 +183,22 @@
       margin-right: 4px;
     }
   }
+
+  /* Wide product details modal styles */
+.wide-modal .modal-content {
+  max-width: 800px;
+  width: 90vw;
+  min-height: 350px;
+  padding: 32px 24px 24px 24px;
+  position: relative;
+}
+.wide-modal .modal-content img {
+  background: #f5f5f5;
+}
+@media (max-width: 900px) {
+  .wide-modal .modal-content {
+    flex-direction: column;
+    max-width: 98vw;
+    padding: 16px 4vw;
+  }
+}

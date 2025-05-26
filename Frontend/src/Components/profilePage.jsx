@@ -3,6 +3,9 @@ import { useParams } from 'react-router-dom';
 import './profilePage.css';
 import Nav from './nav';
 import Sidebar from './sidebar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMobileAlt, faCar, faHome, faBuilding, faPlug, faBicycle, faIndustry, faPaw, faCouch, faTshirt, faBook, faChild, faTools, faBriefcase ,faCross,faClose} from '@fortawesome/free-solid-svg-icons';
+
 
 export default function ProfilePage() {
   const { userId } = useParams();
@@ -149,19 +152,69 @@ export default function ProfilePage() {
         {user && user.posts && user.posts.length > 0 && (
           <div className="profile-posts">
             <h3>{user.name.split(' ')[0]}'s Posts</h3>
-            <div className="profile-posts-list">
-              {user.posts.map(post => (
-                <div key={post.id} className="profile-post-item">
-                  <img
-                    src={post.image ? (post.image.startsWith('http') ? post.image : `http://127.0.0.1:8000/media/${post.image}`) : ''}
-                    alt={post.caption}
-                    className="profile-post-img"
-                  />
-                  <div className="profile-post-caption">{post.caption}</div>
-                  <div className="profile-post-date">{new Date(post.created_at).toLocaleString()}</div>
-                </div>
-              ))}
-            </div>
+
+<div className="profile-posts-list">
+  {user.posts.map(post => (
+    <div key={post.id} className="profile-post-item" style={{ position: 'relative' }}>
+      {/* Delete Button */}
+      <button
+        className="profile-post-delete-btn"
+        style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          background: 'transparent',
+          color: '#ff3333',
+          border: 'none',
+          borderRadius: '50%',
+          width: 28,
+          height: 28,
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          zIndex: 2,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.2rem',
+        }}
+        title="Delete Post"
+        onClick={async () => {
+          if (!window.confirm('Are you sure you want to delete this post?')) return;
+          try {
+            const response = await fetch('http://127.0.0.1:8000/createpost/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                query: 'DELETE FROM main_post WHERE id = %s',
+                params: [post.id]
+              })
+            });
+            if (response.ok) {
+              setUser(prev => ({
+                ...prev,
+                posts: prev.posts.filter(p => p.id !== post.id)
+              }));
+            } else {
+              alert('Failed to delete post.');
+            }
+          } catch {
+            alert('Failed to delete post.');
+          }
+        }}
+      >
+        <FontAwesomeIcon size='large' icon={faClose}></FontAwesomeIcon>
+      </button>
+      <img
+        src={post.image ? (post.image.startsWith('http') ? post.image : `http://127.0.0.1:8000/media/${post.image}`) : ''}
+        alt={post.caption}
+        className="profile-post-img"
+      />
+      <div className="profile-post-caption">{post.caption}</div>
+      <div className="profile-post-date">{new Date(post.created_at).toLocaleString()}</div>
+    </div>
+  ))}
+</div>
+
           </div>
         )}
       </div>
