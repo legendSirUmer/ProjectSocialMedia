@@ -19,7 +19,16 @@ import Chatroom from './Components/ChatRoom';
 
 function App() {
   const [count, setCount] = useState(0);
-  const isLoggedIn = !!localStorage.getItem('id');
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('id'));
+
+  useEffect(() => {
+    // Listen for changes to localStorage (e.g., login/logout in other tabs)
+    const handleStorage = () => {
+      setIsLoggedIn(!!localStorage.getItem('id'));
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   return (
     <>
@@ -43,7 +52,7 @@ function App() {
           </div>
           <Routes>
             {!isLoggedIn && <Route exact path="/signup" element={<Registration />} />}
-            {!isLoggedIn && <Route exact path="/" element={<Login />}/>} 
+            {!isLoggedIn && <Route exact path="/" element={<Login setIsLoggedIn={setIsLoggedIn} />}/>} 
             {isLoggedIn && <Route exact path="/main" element={<MainPage />} />}
             {isLoggedIn && <Route exact path="/market" element={<MarketPage />} />}
             {isLoggedIn && <Route exact path="/profile/:userId" element={<ProfilePage />} />}

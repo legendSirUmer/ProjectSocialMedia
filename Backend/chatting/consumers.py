@@ -1,6 +1,13 @@
 import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
+from django.utils import timezone
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Backend.settings')
+django.setup()
+
+from .models import ChatMessage
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
@@ -18,6 +25,16 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         username = text_data_json.get('username') or (self.scope['user'].username if hasattr(self.scope['user'], 'username') else 'User')
+
+
+
+        # Use objects.raw to create a ChatMessage (raw SQL insert)
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO chatting_chatmessage (username, message, timestamp) VALUES (%s, %s, %s)",
+                [username, message, timezone.now()]
+            )
 
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,

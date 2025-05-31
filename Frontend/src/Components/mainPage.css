@@ -45,10 +45,13 @@ body {
 /* Facebook-like post styles */
 .feed-wrapper, .Feed {
   width: 100%;
+  height: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+  object-fit: contain;
+  height: auto;
 }
 
 .post {
@@ -58,6 +61,10 @@ body {
   margin-bottom: 24px;
   width: 100%;
   max-width: 700px;
+  max-height: none; /* Remove cropping */
+  object-fit: contain;
+  height: auto;
+
   padding: 18px 18px 10px 18px;
   border: 1px solid #e4e6eb;
 }
@@ -84,6 +91,9 @@ body {
 }
 
 .post-content {
+  max-height: none;
+  object-fit: contain;
+  height: auto;
   font-size: 1rem;
   color: #050505;
   margin-bottom: 10px;
@@ -92,12 +102,15 @@ body {
 
 .post-image {
   width: 100%;
-  height: 520px;
+
   border-radius: 8px;
   object-fit: cover;
   margin-bottom: 10px;
   background: #eee;
   border: 1px solid #e4e6eb;
+  object-fit: contain;
+  height: auto;
+  max-height: none; /* Remove cropping */
 }
 
 .post-actions {

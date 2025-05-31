@@ -40,6 +40,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'jet.dashboard',
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +54,10 @@ INSTALLED_APPS = [
     'channels',
     'main',
     'chat',
+    'chatting'
+
+   # Use django_mssql_backend for MSSQL support
+   
     
 ]
 

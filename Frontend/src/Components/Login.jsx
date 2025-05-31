@@ -7,8 +7,7 @@ import { useState } from 'react';
 import axios from 'axios';
 
 
-const Login = () => {
-
+const Login = ({ setIsLoggedIn }) => { // <-- setIsLoggedIn is added as a prop
 
   const [formData, setFormData] = useState({
     email: '',
@@ -32,9 +31,10 @@ const Login = () => {
         localStorage.setItem('email', JSON.stringify(response.data.email));
         localStorage.setItem('id', (response.data.id));
         localStorage.setItem('profile_pic',(response.data.profileimg));
-        localStorage.setItem('bio', JSON.stringify(response.data.bio));
-        localStorage.setItem('location',JSON.stringify(response.data.location));
+        localStorage.setItem('bio', (response.data.bio));
+        localStorage.setItem('location',(response.data.location));
 
+        if (typeof setIsLoggedIn === 'function') setIsLoggedIn(true);
         console.log(response);
         navigate('/main'); // Redirect to the login page after successful submission
       })
@@ -60,7 +60,6 @@ const Login = () => {
       </div>
       <form onSubmit={handleSubmit} >
         <input name="email"
-            
             value={formData.firstname}
             onChange={handleChange}  type="email" placeholder="Email or phone number" required="" />
         <input name="password"

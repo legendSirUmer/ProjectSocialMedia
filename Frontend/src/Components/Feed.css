@@ -81,9 +81,10 @@
   
   .post-image {
     width: 100%;
-    height: 100%; /* Increased height for taller images */
+    height: 450px; /* Let the image keep its natural aspect ratio */
     border-radius: 8px;
-    object-fit: cover;
+    max-height: none; /* Remove cropping */
+    object-fit: contain; /* Show full image, not cropped */
     margin-bottom: 10px;
     background: #eee;
   }
@@ -107,3 +108,9 @@
   .action-button:hover {
     background-color: #e4e6eb;
   }
+
+  // Add to Feed.css
+.action-button.liked {
+  color: #1976d2 !important;
+  font-weight: bold;
+}

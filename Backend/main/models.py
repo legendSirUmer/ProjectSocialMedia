@@ -7,6 +7,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from threading import Timer
 
+
 User = get_user_model()
 
 # Create your models here.
@@ -30,8 +31,8 @@ class Post(models.Model):
         return self.user
 
 class LikePost(models.Model):
-    post_id = models.CharField(max_length=500)
-    username = models.CharField(max_length=100)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.username
@@ -71,13 +72,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-@receiver(post_save, sender=Product)
-def schedule_product_deletion(sender, instance, created, **kwargs):
-    if created:
-        def delete_instance():
-            instance.delete()
-        Timer(20 * 24 * 60 * 60, delete_instance).start()
-
 class Story(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='story_images')
@@ -86,13 +80,6 @@ class Story(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.text[:20]}"
-
-@receiver(post_save, sender=Story)
-def schedule_story_deletion(sender, instance, created, **kwargs):
-    if created:
-        def delete_instance():
-            instance.delete()
-        Timer(24 * 60 * 60, delete_instance).start()
 
 class Shorts(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -103,3 +90,17 @@ class Shorts(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.title}"
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.message[:30]}..."
+
+
+
+
+from .observer import notify_friends_on_post

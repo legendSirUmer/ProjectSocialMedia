@@ -124,6 +124,51 @@ Columns:
 - last_name (NVARCHAR(150)): Last name of the user.
 - email (NVARCHAR(254)): Email address of the user.
 
+Table: dbo.main_post
+Columns:
+- id (INT, PRIMARY KEY): Unique identifier for the post.
+- user_id (INT, FOREIGN KEY): ID of the user who created the post.
+- content (NVARCHAR(MAX)): Content of the post.
+- image (NVARCHAR(100)): Image path for the post.
+- created_at (DATETIME): Timestamp when the post was created.
+
+Table: dbo.main_story
+Columns:
+- id (INT, PRIMARY KEY): Unique identifier for the story.
+- user_id (INT, FOREIGN KEY): ID of the user who created the story.
+- image (NVARCHAR(100)): Image path for the story.
+- created_at (DATETIME): Timestamp when the story was created.
+
+Table: dbo.main_product
+Columns:
+- id (INT, PRIMARY KEY): Unique identifier for the product.
+- user_id (INT, FOREIGN KEY): ID of the seller.
+- title (NVARCHAR(100)): Title of the product.
+- description (NVARCHAR(MAX)): Description of the product.
+- price (DECIMAL): Price of the product.
+- image (NVARCHAR(100)): Image path for the product.
+- created_at (DATETIME): Timestamp when the product was listed.
+
+Table: dbo.main_short
+Columns:
+- id (INT, PRIMARY KEY): Unique identifier for the short.
+- user_id (INT, FOREIGN KEY): ID of the user who uploaded the short.
+- video (NVARCHAR(100)): Video path for the short.
+- created_at (DATETIME): Timestamp when the short was uploaded.
+
+Table: dbo.main_follower
+Columns:
+- id (INT, PRIMARY KEY): Unique identifier for the follower relationship.
+- user_id (INT, FOREIGN KEY): ID of the user being followed.
+- follower_id (INT, FOREIGN KEY): ID of the follower.
+
+Table: dbo.chatting_chatmessage
+Columns:
+- id (INT, PRIMARY KEY): Unique identifier for the chat message.
+- username (NVARCHAR(150)): Username of the sender.
+- message (NVARCHAR(MAX)): The chat message content.
+- timestamp (DATETIME): Time the message was sent.
+
 You can use the 'execute_sql_query' tool to run SELECT queries against these tables.
 """
 
