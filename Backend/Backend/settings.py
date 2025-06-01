@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'channels',
     'main',
-    'chat',
     'chatting'
 
    # Use django_mssql_backend for MSSQL support

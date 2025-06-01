@@ -1,0 +1,177 @@
+BEGIN TRANSACTION
+--
+-- Create model FollowersCount
+--
+CREATE TABLE [main_followerscount] ([id] bigint NOT NULL PRIMARY KEY IDENTITY (1, 1), [follower] nvarchar(100) NOT NULL, [user] nvarchar(100) NOT NULL);
+--
+-- Create model LikePost
+--
+CREATE TABLE [main_likepost] ([id] bigint NOT NULL PRIMARY KEY IDENTITY (1, 1), [post_id] nvarchar(500) NOT NULL, [username] nvarchar(100) NOT NULL);
+--
+-- Create model Post
+--
+CREATE TABLE [main_post] ([id] bigint NOT NULL PRIMARY KEY IDENTITY (1, 1), [user] nvarchar(100) NOT NULL, [image] nvarchar(100) NOT NULL, [caption] nvarchar(max) NOT NULL, [created_at] datetimeoffset NOT NULL, [no_of_likes] int NOT NULL, [encoded_caption] nvarchar(max) NULL, [conversion_table] nvarchar(max) NULL);
+--
+-- Create model Profile
+--
+CREATE TABLE [main_profile] ([id] bigint NOT NULL PRIMARY KEY IDENTITY (1, 1), [id_user] int NOT NULL, [bio] nvarchar(max) NOT NULL, [profileimg] nvarchar(100) NOT NULL, [location] nvarchar(100) NOT NULL, [user_id] int NOT NULL);
+CREATE INDEX [main_profile_user_id_b40d720a] ON [main_profile] ([user_id]);
+ALTER TABLE [main_profile] ADD CONSTRAINT [main_profile_user_id_b40d720a_fk_auth_user_id] FOREIGN KEY ([user_id]) REFERENCES [auth_user] ([id]);
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Remove field conversion_table from post
+--
+ALTER TABLE [main_post] DROP COLUMN [conversion_table];
+--
+-- Remove field encoded_caption from post
+--
+ALTER TABLE [main_post] DROP COLUMN [encoded_caption];
+--
+-- Remove field id_user from profile
+--
+ALTER TABLE [main_profile] DROP COLUMN [id_user];
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Create model Product
+--
+CREATE TABLE [main_product] ([id] bigint NOT NULL PRIMARY KEY IDENTITY (1, 1), [name] nvarchar(255) NOT NULL, [price] numeric(10, 2) NOT NULL, [category] nvarchar(50) NOT NULL, [description] nvarchar(max) NULL, [image] nvarchar(100) NULL);
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Add field User to product
+--
+ALTER TABLE [main_product] ADD [User_id] int DEFAULT 1 NOT NULL;
+SELECT d.name FROM sys.default_constraints d INNER JOIN sys.tables t ON d.parent_object_id = t.object_id INNER JOIN sys.columns c ON d.parent_object_id = c.object_id AND d.parent_column_id = c.column_id INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE t.name = 'main_product' AND c.name = 'User_id';
+ALTER TABLE [main_product] DROP CONSTRAINT [User_id];
+--
+-- Add field created_at to product
+--
+ALTER TABLE [main_product] ADD [created_at] datetimeoffset DEFAULT '2025-06-01 12:36:28.446888+00:00' NOT NULL;
+SELECT d.name FROM sys.default_constraints d INNER JOIN sys.tables t ON d.parent_object_id = t.object_id INNER JOIN sys.columns c ON d.parent_object_id = c.object_id AND d.parent_column_id = c.column_id INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE t.name = 'main_product' AND c.name = 'created_at';
+ALTER TABLE [main_product] DROP CONSTRAINT [created_at];
+CREATE INDEX [main_product_User_id_a47ee45b] ON [main_product] ([User_id]);
+ALTER TABLE [main_product] ADD CONSTRAINT [main_product_User_id_a47ee45b_fk_auth_user_id] FOREIGN KEY ([User_id]) REFERENCES [auth_user] ([id]);
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Alter field follower on followerscount
+--
+EXEC sp_rename '[main_followerscount].[follower]', [follower_id], 'COLUMN';
+ALTER TABLE [main_followerscount] ALTER COLUMN [follower_id] int NOT NULL;
+CREATE INDEX [main_followerscount_follower_id_b3536ce6] ON [main_followerscount] ([follower_id]);
+ALTER TABLE [main_followerscount] ADD CONSTRAINT [main_followerscount_follower_id_b3536ce6_fk_auth_user_id] FOREIGN KEY ([follower_id]) REFERENCES [auth_user] ([id]);
+--
+-- Alter field user on followerscount
+--
+EXEC sp_rename '[main_followerscount].[user]', [user_id], 'COLUMN';
+ALTER TABLE [main_followerscount] ALTER COLUMN [user_id] int NOT NULL;
+CREATE INDEX [main_followerscount_user_id_0ad79476] ON [main_followerscount] ([user_id]);
+ALTER TABLE [main_followerscount] ADD CONSTRAINT [main_followerscount_user_id_0ad79476_fk_auth_user_id] FOREIGN KEY ([user_id]) REFERENCES [auth_user] ([id]);
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Create model Story
+--
+CREATE TABLE [main_story] ([id] bigint NOT NULL PRIMARY KEY IDENTITY (1, 1), [image] nvarchar(100) NOT NULL, [text] nvarchar(max) NOT NULL, [created_at] datetimeoffset NOT NULL, [user_id] int NOT NULL);
+CREATE INDEX [main_story_user_id_0f370e09] ON [main_story] ([user_id]);
+ALTER TABLE [main_story] ADD CONSTRAINT [main_story_user_id_0f370e09_fk_auth_user_id] FOREIGN KEY ([user_id]) REFERENCES [auth_user] ([id]);
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Create model Shorts
+--
+CREATE TABLE [main_shorts] ([id] bigint NOT NULL PRIMARY KEY IDENTITY (1, 1), [video] nvarchar(100) NOT NULL, [title] nvarchar(255) NOT NULL, [description] nvarchar(max) NOT NULL, [created_at] datetimeoffset NOT NULL, [user_id] int NOT NULL);
+CREATE INDEX [main_shorts_user_id_2036b368] ON [main_shorts] ([user_id]);
+ALTER TABLE [main_shorts] ADD CONSTRAINT [main_shorts_user_id_2036b368_fk_auth_user_id] FOREIGN KEY ([user_id]) REFERENCES [auth_user] ([id]);
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Create model Comment
+--
+CREATE TABLE [main_comment] ([id] bigint NOT NULL PRIMARY KEY IDENTITY (1, 1), [content] nvarchar(max) NOT NULL, [created_at] datetimeoffset NOT NULL, [post_id] bigint NOT NULL, [user_id] int NOT NULL);
+ALTER TABLE [main_comment] ADD CONSTRAINT [main_comment_user_id_cf3356a1_fk_auth_user_id] FOREIGN KEY ([user_id]) REFERENCES [auth_user] ([id]);
+CREATE INDEX [main_comment_post_id_8158f528] ON [main_comment] ([post_id]);
+ALTER TABLE [main_comment] ADD CONSTRAINT [main_comment_post_id_8158f528_fk_main_post_id] FOREIGN KEY ([post_id]) REFERENCES [main_post] ([id]);
+CREATE INDEX [main_comment_user_id_cf3356a1] ON [main_comment] ([user_id]);
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Delete model Comment
+--
+
+        DECLARE @sql_foreign_constraint_name nvarchar(128)
+        DECLARE @sql_drop_constraint nvarchar(300)
+        WHILE EXISTS(SELECT 1
+            FROM sys.foreign_keys
+            WHERE referenced_object_id = object_id('[main_comment]'))
+        BEGIN
+            SELECT TOP 1 @sql_foreign_constraint_name = name
+            FROM sys.foreign_keys
+            WHERE referenced_object_id = object_id('[main_comment]')
+            SELECT
+            @sql_drop_constraint = 'ALTER TABLE [' + OBJECT_NAME(parent_object_id) + '] ' +
+            'DROP CONSTRAINT [' + @sql_foreign_constraint_name + '] '
+            FROM sys.foreign_keys
+            WHERE referenced_object_id = object_id('[main_comment]') and name = @sql_foreign_constraint_name
+            exec sp_executesql @sql_drop_constraint
+        END
+        DROP TABLE [main_comment]
+;
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Create model Notification
+--
+CREATE TABLE [main_notification] ([id] bigint NOT NULL PRIMARY KEY IDENTITY (1, 1), [message] nvarchar(max) NOT NULL, [is_read] bit NOT NULL, [created_at] datetimeoffset NOT NULL, [user_id] int NOT NULL);
+CREATE INDEX [main_notification_user_id_8efbf76d] ON [main_notification] ([user_id]);
+ALTER TABLE [main_notification] ADD CONSTRAINT [main_notification_user_id_8efbf76d_fk_auth_user_id] FOREIGN KEY ([user_id]) REFERENCES [auth_user] ([id]);
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Remove field username from likepost
+--
+ALTER TABLE [main_likepost] DROP COLUMN [username];
+--
+-- Add field user_id to likepost
+--
+ALTER TABLE [main_likepost] ADD [user_id_id] int DEFAULT 1 NOT NULL;
+SELECT d.name FROM sys.default_constraints d INNER JOIN sys.tables t ON d.parent_object_id = t.object_id INNER JOIN sys.columns c ON d.parent_object_id = c.object_id AND d.parent_column_id = c.column_id INNER JOIN sys.schemas s ON t.schema_id = s.schema_id WHERE t.name = 'main_likepost' AND c.name = 'user_id_id';
+ALTER TABLE [main_likepost] DROP CONSTRAINT [user_id_id];
+--
+-- Alter field post_id on likepost
+--
+EXEC sp_rename '[main_likepost].[post_id]', [post_id_id], 'COLUMN';
+ALTER TABLE [main_likepost] ALTER COLUMN [post_id_id] bigint NOT NULL;
+CREATE INDEX [main_likepost_post_id_id_f6836233] ON [main_likepost] ([post_id_id]);
+ALTER TABLE [main_likepost] ADD CONSTRAINT [main_likepost_post_id_id_f6836233_fk_main_post_id] FOREIGN KEY ([post_id_id]) REFERENCES [main_post] ([id]);
+CREATE INDEX [main_likepost_user_id_id_6d16433e] ON [main_likepost] ([user_id_id]);
+ALTER TABLE [main_likepost] ADD CONSTRAINT [main_likepost_user_id_id_6d16433e_fk_auth_user_id] FOREIGN KEY ([user_id_id]) REFERENCES [auth_user] ([id]);
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Rename field post_id on likepost to post
+--
+EXEC sp_rename '[main_likepost].[post_id_id]', [post_id], 'COLUMN';
+--
+-- Rename field user_id on likepost to user
+--
+EXEC sp_rename '[main_likepost].[user_id_id]', [user_id], 'COLUMN';
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Create model ChatMessage
+--
+CREATE TABLE [chatting_chatmessage] ([id] bigint NOT NULL PRIMARY KEY IDENTITY (1, 1), [sender] nvarchar(100) NOT NULL, [receiver] nvarchar(100) NOT NULL, [message] nvarchar(max) NOT NULL, [timestamp] datetimeoffset NOT NULL);
+COMMIT;
+BEGIN TRANSACTION
+--
+-- Rename field receiver on chatmessage to username
+--
+EXEC sp_rename '[chatting_chatmessage].[receiver]', [username], 'COLUMN';
+--
+-- Remove field sender from chatmessage
+--
+ALTER TABLE [chatting_chatmessage] DROP COLUMN [sender];
+COMMIT;

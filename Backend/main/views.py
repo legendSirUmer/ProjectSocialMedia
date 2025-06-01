@@ -8,14 +8,19 @@ from .models import Post, Product,Profile ,Shorts
 
 from rest_framework import authentication, permissions
 from django.contrib.auth.models import User
-from django.db import connection
+from django.db import connection, transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from .spam_detecting_agent.agent import is_spam
+from .transactionConcurrency import TransactionAtomic
+from .LRU import LRUCache
 
+
+# LRU cache for user profile lookups (to reduce DB hits for frequent profile fetches)
+profile_lru_cache = LRUCache(capacity=100)
 
 # create a viewset
 
@@ -184,24 +189,22 @@ def login_user(request):
     }
     """
     try:
-           
         email = request.data.get('email')
         password = request.data.get('password')
-        # value = check_password(123,password)
-        # print(value)
-        #gender = request.data.get('gender')
-
         if not email or not password:
             return Response(
                 {"error": "All fields ( email, password) are required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-
         if User.objects.filter(email=email).exists():
             CurrUser = User.objects.get(email=email)
-            
-            CurrProfile = Profile.objects.get(user=CurrUser)
+            # Use LRU cache for profile lookup
+            if CurrUser.id in profile_lru_cache:
+                CurrProfile = profile_lru_cache.get(CurrUser.id)
+            else:
+                CurrProfile = Profile.objects.get(user=CurrUser)
+                profile_lru_cache.put(CurrUser.id, CurrProfile)
             if check_password(password, CurrUser.password):
                 return Response(
                     {"message": "Login successful.","username": CurrUser.username , "email": CurrUser.email, "id": CurrUser.id,'profileimg': CurrProfile.profileimg.url,'bio': CurrProfile.bio,'location': CurrProfile.location},   
@@ -216,8 +219,6 @@ def login_user(request):
                 {"error": "Email incorrect."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-
     except Exception as e:
         return Response(
             {"error": str(e)},
@@ -237,39 +238,40 @@ def follow_user(request):
     }
     """
     try:
-        follower = request.data.get('follower')
-        user = request.data.get('user')
+        with TransactionAtomic():
+            follower = request.data.get('follower')
+            user = request.data.get('user')
 
-        if not follower or not user:
-            return Response(
-                {"error": "Both follower and user are required."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if follower == user:
-            return Response(
-                {"error": "A user cannot follow themselves."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Check if the follow relationship already exists
-        raw_query_check = "SELECT * FROM main_followerscount WHERE user_id = %s AND follower_id = %s"
-        params_check = [follower,user]
-
-        with connection.cursor() as cursor:
-            cursor.execute(raw_query_check, params_check)
-            if cursor.fetchone():
+            if not follower or not user:
                 return Response(
-                    {"message": "You are already following this user."},
-                    status=status.HTTP_200_OK
+                    {"error": "Both follower and user are required."},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
 
-        # Insert the follow relationship into the table
-        raw_query_insert = "INSERT INTO main_followerscount VALUES (%s, %s)"
-        params_insert = [user, follower]
+            if follower == user:
+                return Response(
+                    {"error": "A user cannot follow themselves."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        with connection.cursor() as cursor:
-            cursor.execute(raw_query_insert, params_insert)
+            # Check if the follow relationship already exists
+            raw_query_check = "SELECT * FROM main_followerscount WHERE user_id = %s AND follower_id = %s"
+            params_check = [follower,user]
+
+            with connection.cursor() as cursor:
+                cursor.execute(raw_query_check, params_check)
+                if cursor.fetchone():
+                    return Response(
+                        {"message": "You are already following this user."},
+                        status=status.HTTP_200_OK
+                    )
+
+            # Insert the follow relationship into the table
+            raw_query_insert = "INSERT INTO main_followerscount VALUES (%s, %s)"
+            params_insert = [user, follower]
+
+            with connection.cursor() as cursor:
+                cursor.execute(raw_query_insert, params_insert)
 
         return Response(
             {"message": "Followed the user successfully."},
@@ -295,40 +297,41 @@ def unfollow_user(request):
     }
     """
     try:
-        follower = request.data.get('follower')
-        user = request.data.get('user')
-        print(user,follower)
+        with TransactionAtomic():
+            follower = request.data.get('follower')
+            user = request.data.get('user')
+            print(user,follower)
 
-        if not follower or not user:
-            return Response(
-                {"error": "Both follower and user are required."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if follower == user:
-            return Response(
-                {"error": "A user cannot unfollow themselves."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Check if the follow relationship exists
-        raw_query_check = "SELECT * FROM main_followerscount WHERE user_id = %s AND follower_id = %s"
-        params_check = [ follower,user]
-
-        with connection.cursor() as cursor:
-            cursor.execute(raw_query_check, params_check)
-            if not cursor.fetchone():
+            if not follower or not user:
                 return Response(
-                    {"message": "You are not following this user."},
-                    status=status.HTTP_200_OK
+                    {"error": "Both follower and user are required."},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
-        print(user,follower)
-        # Delete the follow relationship from the table
-        raw_query_delete = "DELETE FROM main_followerscount WHERE user_id = %s AND follower_id = %s"
-        params_delete = [ follower,user]
 
-        with connection.cursor() as cursor:
-            cursor.execute(raw_query_delete, params_delete)
+            if follower == user:
+                return Response(
+                    {"error": "A user cannot unfollow themselves."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Check if the follow relationship exists
+            raw_query_check = "SELECT * FROM main_followerscount WHERE user_id = %s AND follower_id = %s"
+            params_check = [ follower,user]
+
+            with connection.cursor() as cursor:
+                cursor.execute(raw_query_check, params_check)
+                if not cursor.fetchone():
+                    return Response(
+                        {"message": "You are not following this user."},
+                        status=status.HTTP_200_OK
+                    )
+            print(user,follower)
+            # Delete the follow relationship from the table
+            raw_query_delete = "DELETE FROM main_followerscount WHERE user_id = %s AND follower_id = %s"
+            params_delete = [ follower,user]
+
+            with connection.cursor() as cursor:
+                cursor.execute(raw_query_delete, params_delete)
 
         return Response(
             {"message": "Unfollowed the user successfully."},
@@ -355,40 +358,40 @@ def create_post(request):
     }
     """
     try:
-        username = request.data.get('username')
-        caption = request.data.get('caption')
-        image = request.data.get('image')
+        with TransactionAtomic():
+            username = request.data.get('username')
+            caption = request.data.get('caption')
+            image = request.data.get('image')
 
-        if is_spam(caption):
-            return Response(
-            {"error": "Caption detected as spam. Post not created."},
-            status=status.HTTP_403_FORBIDDEN
-        )
-
-        if not username or not caption or not image:
-            return Response(
-                {"error": "All fields (username, caption, image) are required."},
-                status=status.HTTP_400_BAD_REQUEST
+            if is_spam(caption):
+                return Response(
+                {"error": "Caption detected as spam. Post not created."},
+                status=status.HTTP_403_FORBIDDEN
             )
 
-        # Check if the user exists
-        if not User.objects.filter(username=username).exists():
-            return Response(
-                {"error": "User does not exist."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            if not username or not caption or not image:
+                return Response(
+                    {"error": "All fields (username, caption, image) are required."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        # Insert the post into the database
-        Post.objects.create(
-            user=username,
-            caption=caption,
-            image=image
-        )
+            # Check if the user exists
+            if not User.objects.filter(username=username).exists():
+                return Response(
+                    {"error": "User does not exist."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Insert the post into the database
+            Post.objects.create(
+                user=username,
+                caption=caption,
+                image=image
+            )
         return Response(
             {"message": "Post created successfully."},
             status=status.HTTP_201_CREATED
         )
-
     except Exception as e:
         return Response(
             {"error": str(e)},
@@ -412,45 +415,43 @@ def add_product(request):
     }
     """
     try:
-        user_id = request.data.get('user_id')
-        name = request.data.get('name')
-        price = request.data.get('price')
-        category = request.data.get('category')
-        description = request.data.get('description', '')
-        image = request.data.get('image', None)
+        with TransactionAtomic():
+            user_id = request.data.get('user_id')
+            name = request.data.get('name')
+            price = request.data.get('price')
+            category = request.data.get('category')
+            description = request.data.get('description', '')
+            image = request.data.get('image', None)
 
-        
+            if not user_id or not name or not price or not category:
+                return Response(
+                    {"error": "All fields (user_id, name, price, category) are required."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        if not user_id or not name or not price or not category:
-            return Response(
-                {"error": "All fields (user_id, name, price, category) are required."},
-                status=status.HTTP_400_BAD_REQUEST
+            # Check if the user exists
+            if not User.objects.filter(id=user_id).exists():
+                return Response(
+                    {"error": "User does not exist."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            user = User.objects.get(id=user_id)
+
+            # Create the product
+            Product.objects.create(
+                User=user,
+                name=name,
+                price=price,
+                category=category,
+                description=description,
+                image=image
             )
-
-        # Check if the user exists
-        if not User.objects.filter(id=user_id).exists():
-            return Response(
-                {"error": "User does not exist."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        user = User.objects.get(id=user_id)
-
-        # Create the product
-        Product.objects.create(
-            User=user,
-            name=name,
-            price=price,
-            category=category,
-            description=description,
-            image=image
-        )
 
         return Response(
             {"message": "Product added successfully."},
             status=status.HTTP_201_CREATED
         )
-
     except Exception as e:
         return Response(
             {"error": str(e)},
@@ -472,36 +473,36 @@ def update_profile(request):
     }
     """
     try:
-        user_id = request.data.get('user_id')
-        bio = request.data.get('bio', None)
-        location = request.data.get('location', None)
-        profileimg = request.data.get('profileimg', None)
+        with TransactionAtomic():
+            user_id = request.data.get('user_id')
+            bio = request.data.get('bio', None)
+            location = request.data.get('location', None)
+            profileimg = request.data.get('profileimg', None)
 
-        if not user_id:
-            return Response(
-                {"error": "user_id is required."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            if not user_id:
+                return Response(
+                    {"error": "user_id is required."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        if not Profile.objects.filter(user_id=user_id).exists():
-            return Response(
-                {"error": "Profile does not exist for this user."},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            if not Profile.objects.filter(user_id=user_id).exists():
+                return Response(
+                    {"error": "Profile does not exist for this user."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-        profile = Profile.objects.get(user_id=user_id)
-        if bio is not None:
-            profile.bio = bio
-        if location is not None:
-            profile.location = location
-        if profileimg is not None:
-            profile.profileimg = profileimg
-        profile.save()
+            profile = Profile.objects.get(user_id=user_id)
+            if bio is not None:
+                profile.bio = bio
+            if location is not None:
+                profile.location = location
+            if profileimg is not None:
+                profile.profileimg = profileimg
+            profile.save()
 
         return Response(
             {"message": "Profile updated successfully.",
              "profileimg": profile.profileimg.url,
-             
              },
             status=status.HTTP_200_OK
         )
@@ -525,36 +526,37 @@ def create_post_object(request):
     }
     """
     try:
-        username = request.POST.get('username')
-        caption = request.POST.get('caption')
-        image = request.FILES.get('image')
+        with TransactionAtomic():
+            username = request.POST.get('username')
+            caption = request.POST.get('caption')
+            image = request.FILES.get('image')
 
-        if not username or not caption or not image:
-            return Response(
-                {"error": "All fields (username, caption, image) are required."},
-                status=status.HTTP_400_BAD_REQUEST
+            if not username or not caption or not image:
+                return Response(
+                    {"error": "All fields (username, caption, image) are required."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Check if the user exists
+            if not User.objects.filter(username=username).exists():
+                return Response(
+                    {"error": "User does not exist."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # SPAM CHECK
+            if is_spam(caption):
+                return Response(
+                    {"error": "Caption detected as spam. Post not allowed."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Create the post
+            Post.objects.create(
+                user=username,
+                caption=caption,
+                image=image
             )
-
-        # Check if the user exists
-        if not User.objects.filter(username=username).exists():
-            return Response(
-                {"error": "User does not exist."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # SPAM CHECK
-        if is_spam(caption):
-            return Response(
-                {"error": "Caption detected as spam. Post not allowed."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        # Create the post
-        Post.objects.create(
-            user=username,
-            caption=caption,
-            image=image
-        )
         return Response(
             {"message": "Post created successfully."},
             status=status.HTTP_201_CREATED
@@ -570,25 +572,29 @@ def suggested_users(request):
     """
     Returns a list of random user suggestions (excluding the current user if provided).
     Each user includes id, username, and profileimg (if exists).
+    Uses LRU cache for profile lookups to reduce DB hits.
     """
     import random
     from .models import Profile
     try:
-        # Optionally exclude the current user from suggestions
         current_user_id = request.data.get('user_id')
-        print(current_user_id)
         users_qs = Profile.objects.all()
         if current_user_id:
             users_qs = users_qs.exclude(user_id=current_user_id)
         users = list(users_qs)
-        print(users)
         random.shuffle(users)
         suggestions = []
         for user in users[:5]:  # Limit to 5 suggestions
+            # Use LRU cache for profile lookup
+            if user.user.id in profile_lru_cache:
+                profile = profile_lru_cache.get(user.user.id)
+            else:
+                profile = user
+                profile_lru_cache.put(user.user.id, profile)
             suggestions.append({
-                'id': user.user.id,
-                'username': user.user.username,
-                'profileimg': user.profileimg.url if user.profileimg else ''
+                'id': profile.user.id,
+                'username': profile.user.username,
+                'profileimg': profile.profileimg.url if profile.profileimg else ''
             })
         return Response(suggestions, status=status.HTTP_200_OK)
     except Exception as e:
@@ -608,19 +614,20 @@ def create_story(request):
     }
     """
     try:
-        user_id = request.POST.get('user_id')
-        text = request.POST.get('text', '')
-        image = request.FILES.get('image', None)
+        with TransactionAtomic():
+            user_id = request.POST.get('user_id')
+            text = request.POST.get('text', '')
+            image = request.FILES.get('image', None)
 
-        if not user_id:
-            return Response({"error": "user_id is required."}, status=status.HTTP_400_BAD_REQUEST)
-        if not image and not text.strip():
-            return Response({"error": "Please add an image or text for your story."}, status=status.HTTP_400_BAD_REQUEST)
-        if not User.objects.filter(id=user_id).exists():
-            return Response({"error": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-        user = User.objects.get(id=user_id)
-        from .models import Story
-        story = Story.objects.create(user=user, image=image, text=text)
+            if not user_id:
+                return Response({"error": "user_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+            if not image and not text.strip():
+                return Response({"error": "Please add an image or text for your story."}, status=status.HTTP_400_BAD_REQUEST)
+            if not User.objects.filter(id=user_id).exists():
+                return Response({"error": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.get(id=user_id)
+            from .models import Story
+            story = Story.objects.create(user=user, image=image, text=text)
         return Response({"message": "Story created successfully.", "story_id": story.id}, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -640,17 +647,18 @@ def upload_short(request):
     }
     """
     try:
-        user_id = request.POST.get('user_id')
-        title = request.POST.get('title')
-        description = request.POST.get('description', '')
-        video = request.FILES.get('video')
+        with TransactionAtomic():
+            user_id = request.POST.get('user_id')
+            title = request.POST.get('title')
+            description = request.POST.get('description', '')
+            video = request.FILES.get('video')
 
-        if not user_id or not title or not video:
-            return Response({"error": "user_id, title, and video are required."}, status=status.HTTP_400_BAD_REQUEST)
-        if not User.objects.filter(id=user_id).exists():
-            return Response({"error": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-        user = User.objects.get(id=user_id)
-        short = Shorts.objects.create(user=user, title=title, description=description, video=video)
+            if not user_id or not title or not video:
+                return Response({"error": "user_id, title, and video are required."}, status=status.HTTP_400_BAD_REQUEST)
+            if not User.objects.filter(id=user_id).exists():
+                return Response({"error": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.get(id=user_id)
+            short = Shorts.objects.create(user=user, title=title, description=description, video=video)
         return Response({"message": "Short uploaded successfully.", "short_id": short.id}, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
